@@ -77,25 +77,34 @@ export const login = async(req,res) => {
     }
 }
 
-// export const updateProfileInfo = async(req,res) =>{
-//     try{
-//         const {username, fullName,profilePhoto, affiliation} = req.body;
-//         if(!username) {
-//             return res.status(400).json({success:false, message:"Username return karde backend me saath me"});
-//         }
+export const updateProfileInfo = async(req,res) =>{
+    try{
+        const {username, fullName,profilePhoto, affiliation} = req.body;
+        if(!username) {
+            return res.status(400).json({success:false, message:"Username return karde backend me saath me"});
+        }
 
-//         const user = await User.findOne({username});
-//         if(!user) {
-//             return res.status(400).json({
-//                 message:"Incorrect username or password",
-//                 success:false
-//             })
-//         };
+        const user = await User.findOne({username});
+        if(!user) {
+            return res.status(400).json({
+                message:"Incorrect username or password",
+                success:false
+            })
+        };
 
-//     } catch(err) {
-//         console.log(err);
-//     }
-// }
+        await User.updateOne({
+            fullName: fullName, profilePhoto: profilePhoto, affiliation: affiliation
+        });
+
+        return res.status(200).json({
+            success:true,
+            message: "Profile updated successfully"
+        })
+
+    } catch(err) {
+        console.log(err);
+    }
+}
 
 export const logout = async(req,res) => {
     try {
