@@ -26,7 +26,9 @@ const problemModel = new mongoose.Schema({
     // testCaseFolder: {
     //     type:String, 
     //     required:true
-    // }
+    // },
+
+    createdBy: { type:mongoose.Schema.Types.ObjectId, ref:"User" }
 },{timestamps:true });
 
 export const Problem =mongoose.model("Problem", problemModel);
