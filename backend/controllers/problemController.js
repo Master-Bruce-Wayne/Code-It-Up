@@ -68,5 +68,45 @@ export const createProblem = async(req,res) =>{
 
     } catch(err) {
         console.log(err);
+        // res.status(500).json({ message: err.message });
+    }
+}
+
+export const getAllProblems = async(req,res) => {
+    try {
+        const allProblems = await Problem.find();
+        return res.status(200).json(allProblems);
+    } catch(err) {
+        console.log(err);
+        // res.status(500).json({ message: err.message });
+    }
+}
+
+export const getProblemByCode = async(req,res) => {
+    try {
+        const {probCode} = req.params;
+        if(!probCode)  {
+            return res.status(400).json({
+                success:false,
+                message: "Problem code is not provided"
+            })
+        }
+        
+        const problem = await Problem.findOne({probCode});
+        if (!problem) {
+            return res.status(404).json({
+                success: false,
+                message: "Problem not found"
+            });
+        }
+
+        return res.status(200).json({
+            success: true,
+            message: "Problem found",
+            problem
+        });
+    } catch(err) {
+        console.log(err);
+        // res.status(500).json({ message: err.message });
     }
 }

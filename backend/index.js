@@ -7,6 +7,7 @@ import cors from 'cors';
 
 // routes
 import userRouter from './routes/userRoute.js'
+import problemRouter from './routes/problemRoute.js'
 
 dotenv.config({});
 
@@ -24,6 +25,7 @@ app.use(cookieParser());
 
 // routes
 app.use('/api/v1/user', userRouter);
+app.use('api/v1/problem', problemRouter);
 
 app.get('/', (req,res) => {
     return res.send("Kaam kar raha hai");
