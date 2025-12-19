@@ -8,6 +8,7 @@ import cors from 'cors';
 // routes
 import userRouter from './routes/userRoute.js'
 import problemRouter from './routes/problemRoute.js'
+import contestRouter from './routes/contestRouter.js'
 
 dotenv.config({});
 
@@ -26,12 +27,13 @@ app.use(cookieParser());
 // routes
 app.use('/api/v1/user', userRouter);
 app.use('api/v1/problem', problemRouter);
+app.use('/api/v1/contest', contestRouter);
 
 app.get('/', (req,res) => {
     return res.send("Kaam kar raha hai");
 });
 
-// connect db first then start server
+
 const startServer = async () => {
     try {
         await connectDB()
