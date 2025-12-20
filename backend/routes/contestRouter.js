@@ -1,5 +1,5 @@
 import express from "express"
-import { createNewContest, getAllContests, getContestByCode } from "../controllers/contestController";
+import { createNewContest, getAllContests, getContestByCode } from "../controllers/contestController.js";
 
 
 const router=express.Router();

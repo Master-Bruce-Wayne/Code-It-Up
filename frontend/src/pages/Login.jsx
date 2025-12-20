@@ -5,7 +5,7 @@ import { useAuth } from "../context/User.jsx";
 import { useNavigate } from "react-router-dom";
 
 const Login = () => {
-  const {userData, setUserData} = useAuth();
+  const { setUserData } = useAuth();
   const navigate = useNavigate();
   const { register, handleSubmit, formState: { errors } } = useForm();
 
@@ -33,6 +33,7 @@ const Login = () => {
 
       setUserData(userInfo);
       localStorage.setItem("userData", JSON.stringify(userInfo));
+      alert("User logged in")
       navigate("/");
     } catch (err) {
       console.error("Login error:", err.message);
@@ -41,71 +42,65 @@ const Login = () => {
   };
 
   return (
-    <div className="">
-      <div className="">
-        <div className="">
-          <form onSubmit={handleSubmit(onSubmit)} className="">
+    <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4">
+      <div className="w-full max-w-md bg-white shadow-lg rounded-xl p-6">
+        <h2 className="text-3xl font-bold text-center mb-2">
+          Sign In
+        </h2>
+        <p className="text-gray-500 text-center mb-6">
+          Welcome back! Please login to continue.
+        </p>
 
-            {/* Username */}
-            <div>
-              <label className="">
-                Username
-              </label>
-              <div className="">
-                <input
-                  type="text"
-                  {...register("username", { required: "Username is required" })}
-                  placeholder="Enter your username"
-                  className=""
-                />
-              </div>
-              {errors.username && (
-                <p className="">
-                  {errors.username.message}
-                </p>
-              )}
-            </div>
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
 
-            {/* Password */}
-            <div>
-              <label className="">
-                Password
-              </label>
-              <div className="">
-                <input
-                  type="password"
-                  {...register("password", { required: "Password is required" })}
-                  placeholder="Enter your password"
-                  className=""
-                />
-              </div>
-              {errors.password && (
-                <p className="">
-                  {errors.password.message}
-                </p>
-              )}
-            </div>
+          {/* Username */}
+          <div>
+            <label className="font-medium">Username</label>
+            <input
+              type="text"
+              {...register("username", { required: "Username is required" })}
+              placeholder="Enter your username"
+              className="w-full mt-1 p-2 border rounded outline-blue-500"
+            />
+            {errors.username && (
+              <p className="text-red-500 text-sm mt-1">
+                {errors.username.message}
+              </p>
+            )}
+          </div>
 
-            {/* Submit Button */}
-            <button
-              type="submit"
-              className=""
-            >
-              Sign In
-            </button>
+          {/* Password */}
+          <div>
+            <label className="font-medium">Password</label>
+            <input
+              type="password"
+              {...register("password", { required: "Password is required" })}
+              placeholder="Enter your password"
+              className="w-full mt-1 p-2 border rounded outline-blue-500"
+            />
+            {errors.password && (
+              <p className="text-red-500 text-sm mt-1">
+                {errors.password.message}
+              </p>
+            )}
+          </div>
 
-            {/* Signup link */}
-            <p className="">
-              Don't have an account?{" "}
-              <a 
-                href="/register" 
-                className=""
-              >
-                Sign up
-              </a>
-            </p>
-          </form>
-        </div>
+          {/* Submit Button */}
+          <button
+            type="submit"
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-md font-semibold transition hover:cursor-pointer"
+          >
+            Sign In
+          </button>
+
+          {/* Signup link */}
+          <p className="text-center text-gray-600">
+            Don't have an account?{" "}
+            <a href="/register" className="text-blue-600 font-semibold hover:underline">
+              Sign up
+            </a>
+          </p>
+        </form>
       </div>
     </div>
   );

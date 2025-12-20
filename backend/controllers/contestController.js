@@ -1,4 +1,4 @@
-import { Contest } from "../models/contestModel";
+import { Contest } from "../models/contestModel.js";
 
 export const createNewContest = async (req, res) => {
     try {

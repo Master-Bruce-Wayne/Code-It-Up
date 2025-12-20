@@ -5,9 +5,17 @@ import { useAuth } from "../context/User.jsx";
 import { useNavigate } from "react-router-dom";
 
 const Register = () => {
-  const {setUserData} = useAuth();
+  const { setUserData } = useAuth();
   const navigate = useNavigate();
-  const { register, handleSubmit, formState: { errors } } = useForm();
+
+  const {
+    register,
+    handleSubmit,
+    watch,
+    formState: { errors }
+  } = useForm();
+
+  const passwordValue = watch("password");
 
   const onSubmit = async (data) => {
     const apiUrl = import.meta.env.VITE_API_BASE_URL;
@@ -31,111 +39,104 @@ const Register = () => {
   };
 
   return (
-    <div className="">
-      <div className="">
-        <div className="">
-          <form onSubmit={handleSubmit(onSubmit)} className="">
+    <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4">
+      <div className="w-full max-w-md bg-white shadow-lg rounded-xl p-6">
+        <h2 className="text-3xl font-bold text-center mb-2">
+          Create Account
+        </h2>
+        <p className="text-gray-500 text-center mb-6">
+          Join the platform and start coding!
+        </p>
 
-            {/* Username */}
-            <div>
-              <label className="">
-                Username
-              </label>
-              <div className="">
-                <input
-                  type="text"
-                  {...register("username", { required: "Username is required" })}
-                  placeholder="Enter your username"
-                  className=""
-                />
-              </div>
-              {errors.username && (
-                <p className="">
-                  {errors.username.message}
-                </p>
-              )}
-            </div>
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
 
-            {/* Password */}
-            <div>
-              <label className="">
-                Password
-              </label>
-              <div className="">
-                <input
-                  type="password"
-                  {...register("password", { required: "Password is required" })}
-                  placeholder="Enter your password"
-                  className=""
-                />
-              </div>
-              {errors.password && (
-                <p className="">
-                  {errors.password.message}
-                </p>
-              )}
-            </div>
+          {/* Username */}
+          <div>
+            <label className="font-medium">Username</label>
+            <input
+              type="text"
+              placeholder="Enter your username"
+              className="w-full mt-1 p-2 border rounded outline-blue-500"
+              {...register("username", { required: "Username is required" })}
+            />
+            {errors.username && (
+              <p className="text-red-500 text-sm mt-1">
+                {errors.username.message}
+              </p>
+            )}
+          </div>
 
-            {/* Email */}
-            <div>
-              <label className="">
-                Email
-              </label>
-              <div className="">
-                <input
-                  type="email"
-                  {...register("email", { required: "Email is required" })}
-                  className=""
-                  placeholder="Enter your email"
-                />
-              </div>
-              {errors.email && (
-                <p className="">
-                  {errors.email.message}
-                </p>
-              )}
-            </div>
+          {/* Email */}
+          <div>
+            <label className="font-medium">Email</label>
+            <input
+              type="email"
+              placeholder="Enter your email"
+              className="w-full mt-1 p-2 border rounded outline-blue-500"
+              {...register("email", { required: "Email is required" })}
+            />
+            {errors.email && (
+              <p className="text-red-500 text-sm mt-1">
+                {errors.email.message}
+              </p>
+            )}
+          </div>
 
-            {/* Confirm Password */}
-            <div>
-              <label className="">
-                Confirm Password
-              </label>
-              <div className="">
-                <input
-                  type="password"
-                  {...register("confirmPassword", { required: "Confirm your password" })}
-                  className=""
-                  placeholder="Re-enter password"
-                />
-              </div>
-              {errors.confirmPassword && (
-                <p className="">
-                  {errors.confirmPassword.message}
-                </p>
-              )}
-            </div>
+          {/* Password */}
+          <div>
+            <label className="font-medium">Password</label>
+            <input
+              type="password"
+              placeholder="Enter your password"
+              className="w-full mt-1 p-2 border rounded outline-blue-500"
+              {...register("password", { required: "Password is required" })}
+            />
+            {errors.password && (
+              <p className="text-red-500 text-sm mt-1">
+                {errors.password.message}
+              </p>
+            )}
+          </div>
 
-            {/* Submit Button */}
-            <button
-              type="submit"
-              className=""
+          {/* Confirm Password */}
+          <div>
+            <label className="font-medium">Confirm Password</label>
+            <input
+              type="password"
+              placeholder="Re-enter password"
+              className="w-full mt-1 p-2 border rounded outline-blue-500"
+              {...register("confirmPassword", {
+                required: "Confirm your password",
+                validate: (value) =>
+                  value === passwordValue || "Passwords do not match",
+              })}
+            />
+            {errors.confirmPassword && (
+              <p className="text-red-500 text-sm mt-1">
+                {errors.confirmPassword.message}
+              </p>
+            )}
+          </div>
+
+          {/* Submit */}
+          <button
+            type="submit"
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-md font-semibold transition hover:cursor-pointer"
+          >
+            Register
+          </button>
+
+          {/* Login Link */}
+          <p className="text-center text-gray-600">
+            Already have an account?{" "}
+            <a
+              href="/login"
+              className="text-blue-600 font-semibold hover:underline"
             >
-              Sign In
-            </button>
-
-            {/* Signup link */}
-            <p className="">
-              Don't have an account?{" "}
-              <a 
-                href="/register" 
-                className=""
-              >
-                Sign up
-              </a>
-            </p>
-          </form>
-        </div>
+              Login
+            </a>
+          </p>
+        </form>
       </div>
     </div>
   );

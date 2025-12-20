@@ -1,4 +1,4 @@
-import {Problem } from "../models/problemModel";
+import {Problem } from "../models/problemModel.js";
 // import mongoose from "mongoose";
 
 export const createProblem = async(req,res) =>{
