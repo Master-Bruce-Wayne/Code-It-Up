@@ -4,26 +4,58 @@ import { useParams, Link } from "react-router-dom";
 const ContestPage = () => {
   const { contestCode } = useParams();
   const [contest, setContest] = useState(null);
+  const [problems, setProblems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  const apiUrl = import.meta.env.VITE_API_BASE_URL;
+
   useEffect(() => {
     const fetchContest = async () => {
-      const apiUrl = import.meta.env.VITE_API_BASE_URL;
-
       try {
         const res = await fetch(`${apiUrl}/contest/${contestCode}`);
         const data = await res.json();
 
         if (!data.success) {
           setError(data.message || "Failed to load contest");
-        } else {
-          setContest(data.contest);
+          setLoading(false);
+          return;
         }
+
+        setContest(data.contest);
+
+        // fetch problems now
+        await fetchProblems(data.contest.problems);
       } catch (err) {
         setError("Server error while fetching contest");
       } finally {
         setLoading(false);
+      }
+    };
+
+    const fetchProblems = async (problemArray) => {
+      try {
+        const results = await Promise.all(
+          problemArray.map(async (p) => {
+            const res = await fetch(
+              `${apiUrl}/problem/getById/${p.problemId}`
+            );
+            const data = await res.json();
+
+            if (!data.success) return null;
+
+            return {
+              index: p.index,
+              probName: data.problem.probName,
+              probCode: data.problem.probCode,
+              probRating: data.problem.probRating
+            };
+          })
+        );
+
+        setProblems(results.filter(Boolean));
+      } catch (err) {
+        setError("Failed to load contest problems");
       }
     };
 
@@ -39,7 +71,9 @@ const ContestPage = () => {
 
   if (error)
     return (
-      <h2 className="text-center text-red-500 text-xl mt-10">{error}</h2>
+      <h2 className="text-center text-red-500 text-xl mt-10">
+        {error}
+      </h2>
     );
 
   if (!contest) return null;
@@ -60,14 +94,18 @@ const ContestPage = () => {
             <span className="font-semibold">Start:</span>{" "}
             {new Date(contest.startTime).toLocaleString()}
           </p>
+
           <p>
-            <span className="font-semibold">End:</span>{" "}
-            {new Date(contest.endTime).toLocaleString()}
+            <span className="font-semibold">Duration:</span>{" "}
+            {contest.duration} minutes
           </p>
+
           <p>
             <span className="font-semibold">Rated:</span>{" "}
             {contest.rated ? (
-              <span className="text-green-600 font-semibold">Yes</span>
+              <span className="text-green-600 font-semibold">
+                Yes
+              </span>
             ) : (
               <span className="text-gray-500">No</span>
             )}
@@ -78,8 +116,8 @@ const ContestPage = () => {
       {/* Problems Table */}
       <h2 className="text-2xl font-semibold mb-4">Problems</h2>
 
-      {contest.problems?.length === 0 ? (
-        <p className="text-gray-500">No problems added yet.</p>
+      {problems.length === 0 ? (
+        <p className="text-gray-500">No problems found.</p>
       ) : (
         <div className="overflow-x-auto">
           <table className="w-full border border-gray-300 rounded-lg">
@@ -93,24 +131,20 @@ const ContestPage = () => {
             </thead>
 
             <tbody>
-              {contest.problems?.map((p, i) => (
+              {problems.map((p, i) => (
                 <tr
                   key={i}
                   className="text-center border hover:bg-gray-50 transition"
                 >
                   <td className="p-3 border font-semibold">{p.index}</td>
 
-                  <td className="p-3 border">
-                    {p?.problemId?.probName || "Unknown Problem"}
-                  </td>
+                  <td className="p-3 border">{p.probName}</td>
 
-                  <td className="p-3 border font-medium">
-                    {p?.problemId?.probRating || "-"}
-                  </td>
+                  <td className="p-3 border">{p.probRating}</td>
 
                   <td className="p-3 border">
                     <Link
-                      to={`/contest/${contestCode}/problem/${p.problemId?.probCode}`}
+                      to={`/contest/${contestCode}/problem/${p.probCode}`}
                       className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-1 rounded-md transition"
                     >
                       Solve →

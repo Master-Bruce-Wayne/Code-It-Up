@@ -124,3 +124,34 @@ export const getProblemByCode = async(req,res) => {
         res.status(500).json({ sucess:false, message: err.message });
     }
 }
+
+export const getProblemById = async(req,res) => {
+    try {
+        const {id} = req.params;
+        if(!id)  {
+            return res.status(400).json({
+                success:false,
+                message: "Problem id is not provided"
+            })
+        }
+        
+        const problem = await Problem.findOne({_id:id});
+        if (!problem) {
+            return res.status(404).json({
+                success: false,
+                message: "Problem not found"
+            });
+        }
+
+        return res.status(200).json({
+            success: true,
+            message: "Problem found",
+            problem
+        });
+    } catch(err) {
+        return res.status(400).json({
+            sucess:false,
+            message:err.message
+        });
+    }
+}
