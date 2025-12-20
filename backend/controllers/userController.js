@@ -116,3 +116,19 @@ export const logout = async(req,res) => {
         console.log(err);
     }
 }
+
+export const getAllUsers = async(req,res) => {
+    try {
+        const users=await User.find({});
+        return res.status(200).json({
+            success:true,
+            message:"Users fetched",
+            users
+        })
+    } catch(err) {
+        return res.status(200).json({
+            success:false,
+            message:"Failed to return users"
+        })
+    }
+}

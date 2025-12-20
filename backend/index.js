@@ -26,7 +26,7 @@ app.use(cookieParser());
 
 // routes
 app.use('/api/v1/user', userRouter);
-app.use('api/v1/problem', problemRouter);
+app.use('/api/v1/problem', problemRouter);
 app.use('/api/v1/contest', contestRouter);
 
 app.get('/', (req,res) => {

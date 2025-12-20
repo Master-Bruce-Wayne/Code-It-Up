@@ -1,18 +1,22 @@
-import { createContext, useContext, useState } from "react";
-import axios from 'axios';
+import { createContext, useContext, useState, useEffect } from "react";
 
 export const UserContext = createContext(null);
 
-export const UserProvider = (props) => {
-    const [userData,setUserData] = useState(null);
-    return (
-        <UserContext.Provider value={{userData,setUserData}} >
-            {props.children}
-        </UserContext.Provider>
-    )
-}
+export const UserProvider = ({ children }) => {
+  const [userData, setUserData] = useState(null);
 
-export const useAuth = () => {
-    const user = useContext(UserContext);
-    return user;
-}
+  useEffect(() => {
+    const savedUser = localStorage.getItem("userData");
+    if (savedUser) {
+      setUserData(JSON.parse(savedUser));
+    }
+  }, []);
+
+  return (
+    <UserContext.Provider value={{ userData, setUserData }}>
+      {children}
+    </UserContext.Provider>
+  );
+};
+
+export const useAuth = () => useContext(UserContext);

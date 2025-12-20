@@ -1,4 +1,5 @@
 import {Problem } from "../models/problemModel.js";
+import {User} from "../models/userModel.js";
 // import mongoose from "mongoose";
 
 export const createProblem = async(req,res) =>{
@@ -21,7 +22,7 @@ export const createProblem = async(req,res) =>{
         if (
             !probName ||
             !probCode ||
-            !tags ||
+            !probTags ||
             !probStatement ||
             !inputFormat ||
             !outputFormat ||
@@ -45,6 +46,15 @@ export const createProblem = async(req,res) =>{
             });
         }
 
+        // const user = await User.findOne({username: username});
+        // if(!user) {
+        //     return res.status(400).json({
+        //         success:"false",
+        //         message:"User name provided is invalid"
+        //     })
+        // }
+        // const userId=user._id;
+        
         const problem = await Problem.create({
             probName,
             probCode,
@@ -67,18 +77,22 @@ export const createProblem = async(req,res) =>{
         });
 
     } catch(err) {
-        console.log(err);
-        // res.status(500).json({ message: err.message });
+        // console.log(err);
+        res.status(500).json({ success:false, message: err.message });
     }
 }
 
 export const getAllProblems = async(req,res) => {
     try {
-        const allProblems = await Problem.find();
-        return res.status(200).json(allProblems);
+        const problems = await Problem.find();
+        return res.status(200).json({
+            success: true,
+            message:"Problems fetched successfully",
+            problems
+        });
     } catch(err) {
-        console.log(err);
-        // res.status(500).json({ message: err.message });
+        // console.log(err);
+        res.status(500).json({ success:false, message: err.message });
     }
 }
 
@@ -106,7 +120,7 @@ export const getProblemByCode = async(req,res) => {
             problem
         });
     } catch(err) {
-        console.log(err);
-        // res.status(500).json({ message: err.message });
+        // console.log(err);
+        res.status(500).json({ sucess:false, message: err.message });
     }
 }

@@ -13,10 +13,16 @@ import Login from './pages/Login.jsx'
 import Register from './pages/Register.jsx'
 import Problemset from './pages/Problemset.jsx'
 import Contests from './pages/Contests.jsx'
+import ContestPage from './pages/ContestPage.jsx'
+
+// admin pages
+import AddContest from './pages/admin/AddContest.jsx'
+import AddProblems from './pages/admin/AddProblems.jsx'
 
 // components
 import Navbar from './components/Navbar.jsx'
 import Footer from './components/Footer.jsx'
+
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
@@ -29,6 +35,10 @@ createRoot(document.getElementById('root')).render(
           <Route path="/register" element={<Register />} />
           <Route path="/problemset" element={<Problemset />} />
           <Route path="/contests" element={<Contests />} />
+          <Route path="/contest/:contestCode" element={<ContestPage />} />
+
+          <Route path="/admin/addContest" element={<AddContest />} />
+          <Route path="/admin/addProblem" element={<AddProblems/> } />
         </Routes>
         <Footer />
       </UserProvider>
