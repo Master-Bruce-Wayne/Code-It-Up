@@ -42,7 +42,7 @@ createRoot(document.getElementById('root')).render(
           <Route path="/admin/addContest" element={<AddContest />} />
           <Route path="/admin/addProblem" element={<AddProblems/> } />
         </Routes>
-        <Footer />
+        {/* <Footer /> */}
       </UserProvider>
     </BrowserRouter>
   </StrictMode>
