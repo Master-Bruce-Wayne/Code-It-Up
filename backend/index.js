@@ -9,6 +9,7 @@ import cors from 'cors';
 import userRouter from './routes/userRoute.js'
 import problemRouter from './routes/problemRoute.js'
 import contestRouter from './routes/contestRouter.js'
+import submissionRouter from "./routes/submissionRouter.js"
 
 dotenv.config({});
 
@@ -28,6 +29,7 @@ app.use(cookieParser());
 app.use('/api/v1/user', userRouter);
 app.use('/api/v1/problem', problemRouter);
 app.use('/api/v1/contest', contestRouter);
+app.use('/api/v1/submission', submissionRouter);
 
 app.get('/', (req,res) => {
     return res.send("Kaam kar raha hai");
