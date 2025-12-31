@@ -92,22 +92,22 @@ export const submitSolution = async (req, res) => {
         fs.writeFileSync(sourceFile, code);
 
         try {
-        await runCommand(`g++ "${sourceFile}" -o "${execFile}"`);
+            await runCommand(`g++ "${sourceFile}" -o "${execFile}"`);
         } catch {
-        await Submission.create({
-            user: userId,
-            problem: problemId,
-            language,
-            code,
-            verdict: "CE",
-        });
-        return res.json({ success: true, verdict: "CE" });
+            await Submission.create({
+                user: userId,
+                problem: problemId,
+                language,
+                code,
+                verdict: "CE",
+            });
+            return res.json({ success: true, verdict: "CE" });
         }
 
         // ---- judge ----
         const tcFolder = path.join(
-        __dirname,
-        `../assets/judge_data/${problem.probCode}`
+            __dirname,
+            `../assets/judge_data/${problem.probCode}`
         );
 
         if (!fs.existsSync(tcFolder))
@@ -146,8 +146,8 @@ export const submitSolution = async (req, res) => {
             });
 
             if (output.trim() !== expected.trim()) {
-            verdict = "WA";
-            break;
+                verdict = "WA";
+                break;
             }
         } catch {
             verdict = "TLE";
@@ -156,11 +156,11 @@ export const submitSolution = async (req, res) => {
         }
 
         await Submission.create({
-        user: userId,
-        problem: problemId,
-        language,
-        code,
-        verdict,
+            user: userId,
+            problem: problemId,
+            language,
+            code,
+            verdict,
         });
 
         return res.json({ success: true, verdict });
@@ -182,9 +182,9 @@ export const getUserSubmissions = async (req, res) => {
         .sort({ createdAt: -1 });
 
         return res.json({
-        success: true,
-        count: submissions.length,
-        submissions
+            success: true,
+            count: submissions.length,
+            submissions
         });
 
     } catch (err) {
@@ -205,12 +205,16 @@ export const getProblemSubmissions = async (req, res) => {
         .sort({ createdAt: -1 });
 
         return res.json({
-        success: true,
-        count: submissions.length,
-        submissions
+            success: true,
+            count: submissions.length,
+            submissions
         });
 
     } catch (err) {
         return res.json({ success: false, message: err.message });
     }
 };
+
+export const getContestSubmissions = async(req,res) => {
+    
+}
