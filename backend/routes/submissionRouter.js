@@ -1,5 +1,5 @@
 import express from "express";
-import { getProblemSubmissions, getUserSubmissions, runCode, submitSolution } from "../controllers/submissionController.js";
+import { getProblemSubmissionsByCode, getProblemSubmissionsById, getUserSubmissions, runCode, submitSolution } from "../controllers/submissionController.js";
 
 const router = express.Router();
 
@@ -9,7 +9,8 @@ router.post("/run", runCode);
 // Submit → judge testcases → save submission
 router.post("/submit", submitSolution);
 
-router.route("/user/:userId").get(getUserSubmissions);
-router.route("/problem/:problemId").get(getProblemSubmissions);
+router.route("/user/:username").get(getUserSubmissions);
+router.route("/problemById/:problemId").get(getProblemSubmissionsById);
+router.route("/problemByCode/:problemCode").get(getProblemSubmissionsByCode)
 
 export default router;

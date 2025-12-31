@@ -171,13 +171,13 @@ export const submitSolution = async (req, res) => {
 
 export const getUserSubmissions = async (req, res) => {
     try {
-        const { userId } = req.params;
+        const { username } = req.params;
 
-        if (!userId)
+        if (!username)
         return res.json({ success: false, message: "User ID required" });
 
         const submissions = await Submission
-        .find({ user: userId })
+        .find({ username: username })
         .populate("problem", "probName probCode")
         .sort({ createdAt: -1 });
 
@@ -192,7 +192,7 @@ export const getUserSubmissions = async (req, res) => {
     }
 };
 
-export const getProblemSubmissions = async (req, res) => {
+export const getProblemSubmissionsById = async (req, res) => {
     try {
         const { problemId } = req.params;
 
@@ -215,6 +215,29 @@ export const getProblemSubmissions = async (req, res) => {
     }
 };
 
+export const getProblemSubmissionsByCode = async (req, res) => {
+    try {
+        const { problemCode } = req.params;
+
+        if (!problemCode)
+        return res.json({ success: false, message: "Problem Code required" });
+
+        const submissions = await Submission
+        .find({ problemCode: problemCode })
+        .populate("user", "username email")
+        .sort({ createdAt: -1 });
+
+        return res.json({
+            success: true,
+            count: submissions.length,
+            submissions
+        });
+
+    } catch (err) {
+        return res.json({ success: false, message: err.message });
+    }
+};
+
 export const getContestSubmissions = async(req,res) => {
-    
+
 }
