@@ -40,15 +40,15 @@ const Navbar = () => {
             <div className="relative">
               <button
                 onClick={() => setOpenMenu(!openMenu)}
-                className="bg-gray-800 px-3 py-1 rounded-md"
+                className="bg-gray-800 px-3 py-1 rounded-md underline cursor-pointer"
               >
-                {userData.username} ⌄
+                {userData.username} ⌄ 
               </button>
 
               {openMenu && (
                 <div className="absolute right-0 mt-2 bg-white text-black shadow rounded w-36">
                   <Link
-                    to="/profile"
+                    to={`/profile/${userData.username}`}
                     className="block px-3 py-2 hover:bg-gray-200"
                     onClick={() => setOpenMenu(false)}
                   >
@@ -75,7 +75,7 @@ const Navbar = () => {
         </div>
       </div>
 
-      {/* =================== BOTTOM NAV LINKS =================== */}
+      {/* Bottom navbar links */}
       <div className="bg-gray-100 border-b">
         <div className="w-[90%] mx-auto h-10 flex items-center gap-8">
           <NavLink

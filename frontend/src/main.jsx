@@ -15,6 +15,7 @@ import Problemset from './pages/Problemset.jsx'
 import Contests from './pages/Contests.jsx'
 import ContestPage from './pages/ContestPage.jsx'
 import ProblemPage from './pages/ProblemPage.jsx'
+import ProfilePage from './pages/ProfilePage.jsx'
 
 // admin pages
 import AddContest from './pages/admin/AddContest.jsx'
@@ -35,6 +36,7 @@ createRoot(document.getElementById('root')).render(
           {/* auth routes  */}
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/profile/:username" element={<ProfilePage />} />
 
           {/* problemset routes  */}
           <Route path="/problemset" element={<Problemset />} />
