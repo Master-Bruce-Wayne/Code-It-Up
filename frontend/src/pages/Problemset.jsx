@@ -70,7 +70,7 @@ const Problemset = () => {
                   </td>
 
                   <td className="p-3 border font-semibold text-blue-600">
-                    <Link to={`/problem/${p.probCode}`}>
+                    <Link to={`/problemset/problem/${p.probCode}`}>
                       {p.probName}
                     </Link>
                   </td>

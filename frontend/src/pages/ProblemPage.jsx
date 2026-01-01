@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
 // import Editor from "@monaco-editor/react"
 
 const ProblemPage = () => {
+  const location= useLocation();
   const { probCode } = useParams();
   const [problem, setProblem] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -47,6 +48,44 @@ const ProblemPage = () => {
 
   return (
     <div className="w-[85%] mx-auto py-8">
+
+      {/* Navbar  */}
+      <div className="flex gap-6 border-b mb-6 text-lg font-medium">
+
+        <a
+          href={location.pathname}
+          className={`pb-2 ${
+            location.pathname.endsWith(`/problem/${probCode}`)
+              ? "text-blue-600 border-b-2 border-blue-600"
+              : "text-gray-600 hover:text-blue-600"
+          }`}
+        >
+          Problem
+        </a>
+
+        <a
+          href={`/problem/${probCode}/submit`}
+          className={`pb-2 ${
+            location.pathname.includes("/submit")
+              ? "text-blue-600 border-b-2 border-blue-600"
+              : "text-gray-600 hover:text-blue-600"
+          }`}
+        >
+          Submit
+        </a>
+
+        <a
+          href={`/problem/${probCode}/submissions/my`}
+          className={`pb-2 ${
+            location.pathname.includes("/submissions/my")
+              ? "text-blue-600 border-b-2 border-blue-600"
+              : "text-gray-600 hover:text-blue-600"
+          }`}
+        >
+          My Submissions
+        </a>
+      </div>
+
       {/* Header */}
       <div className="border-b pb-4 mb-6">
         <h1 className="text-3xl font-bold">{problem.probName}</h1>
