@@ -80,6 +80,44 @@ const ContestPage = () => {
 
   return (
     <div className="w-[85%] mx-auto py-8">
+
+      {/* Navbar  */}
+      <div className="flex gap-6 border-b mb-6 text-lg font-medium">
+
+        <a
+          href={location.pathname}
+          className={`pb-2 ${
+            location.pathname.endsWith(`/contest/${contestCode}`)
+              ? "text-blue-600 border-b-2 border-blue-600"
+              : "text-gray-600 hover:text-blue-600"
+          }`}
+        >
+          Problems
+        </a>
+
+        <a
+          href={`${location.pathname}/submit`}
+          className={`pb-2 ${
+            location.pathname.includes("/submit")
+              ? "text-blue-600 border-b-2 border-blue-600"
+              : "text-gray-600 hover:text-blue-600"
+          }`}
+        >
+          Submit
+        </a>
+
+        <a
+          href={`${location.pathname}/submissions/my`}
+          className={`pb-2 ${
+            location.pathname.includes("/submissions/my")
+              ? "text-blue-600 border-b-2 border-blue-600"
+              : "text-gray-600 hover:text-blue-600"
+          }`}
+        >
+          My Submissions
+        </a>
+      </div>
+
       {/* Header */}
       <div className="border-b pb-5 mb-6">
         <h1 className="text-3xl font-bold text-gray-800">
