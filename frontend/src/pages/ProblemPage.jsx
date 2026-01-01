@@ -64,7 +64,7 @@ const ProblemPage = () => {
         </a>
 
         <a
-          href={`/problem/${probCode}/submit`}
+          href={`${location.pathname}/submit`}
           className={`pb-2 ${
             location.pathname.includes("/submit")
               ? "text-blue-600 border-b-2 border-blue-600"
@@ -75,7 +75,7 @@ const ProblemPage = () => {
         </a>
 
         <a
-          href={`/problem/${probCode}/submissions/my`}
+          href={`${location.pathname}/submissions/my`}
           className={`pb-2 ${
             location.pathname.includes("/submissions/my")
               ? "text-blue-600 border-b-2 border-blue-600"
