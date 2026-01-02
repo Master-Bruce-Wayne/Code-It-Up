@@ -239,6 +239,29 @@ export const getProblemSubmissionsByCode = async (req, res) => {
     }
 };
 
+export const getUserProblemSubmissions = async (req, res) => {
+    try {
+        const { problemCode,username } = req.params;
+
+        if (!problemCode || !username)
+        return res.json({ success: false, message: "Problem Code and username required" });
+
+        const submissions = await Submission
+        .find({ username, problemCode })
+        .populate("user", "username email")
+        .sort({ createdAt: -1 });
+
+        return res.json({
+            success: true,
+            count: submissions.length,
+            submissions
+        });
+
+    } catch (err) {
+        return res.json({ success: false, message: err.message });
+    }
+};
+
 export const getContestSubmissions = async(req,res) => {
     try {
         const {contestCode} =req.params;
