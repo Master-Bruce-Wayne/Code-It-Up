@@ -5,6 +5,7 @@ import { fileURLToPath } from "url";
 import { Submission } from "../models/submissionModel.js";
 import { Problem } from "../models/problemModel.js";
 import { v4 as uuid } from "uuid";
+import { timeStamp } from "console";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -123,36 +124,36 @@ export const submitSolution = async (req, res) => {
         let verdict = "AC";
 
         for (let file of inputs) {
-        const num = file.match(/\d+/)[0];
+            const num = file.match(/\d+/)[0];
 
-        const input = fs.readFileSync(
-            path.join(tcFolder, `input${num}.txt`),
-            "utf8"
-        );
-        const expected = fs.readFileSync(
-            path.join(tcFolder, `output${num}.txt`),
-            "utf8"
-        );
+            const input = fs.readFileSync(
+                path.join(tcFolder, `input${num}.txt`),
+                "utf8"
+            );
+            const expected = fs.readFileSync(
+                path.join(tcFolder, `output${num}.txt`),
+                "utf8"
+            );
 
-        try {
-            const output = await new Promise((resolve, reject) => {
-            const process = exec(`"${execFile}"`, { timeout: 2000 }, (err, stdout) => {
-                if (err) return reject("TLE");
-                resolve(stdout);
-            });
+            try {
+                const output = await new Promise((resolve, reject) => {
+                const process = exec(`"${execFile}"`, { timeout: 2000 }, (err, stdout) => {
+                    if (err) return reject("TLE");
+                    resolve(stdout);
+                });
 
-            process.stdin.write(input);
-            process.stdin.end();
-            });
+                process.stdin.write(input);
+                process.stdin.end();
+                });
 
-            if (output.trim() !== expected.trim()) {
-                verdict = "WA";
+                if (output.trim() !== expected.trim()) {
+                    verdict = "WA";
+                    break;
+                }
+            } catch {
+                verdict = "TLE";
                 break;
             }
-        } catch {
-            verdict = "TLE";
-            break;
-        }
         }
 
         await Submission.create({
@@ -239,5 +240,63 @@ export const getProblemSubmissionsByCode = async (req, res) => {
 };
 
 export const getContestSubmissions = async(req,res) => {
+    try {
+        const {contestCode} =req.params;
 
+        if(!contestCode) {
+            return res.status(400).json({
+                success: false,
+                message:"Contest Code not provided!"
+            })
+        }
+
+        const result = []
+        for(let i=0; i<26; i++) {
+            const ch= String.fromCharCode(65+i);
+            const problemCode = contestCode+ch;
+            const probSub = await Submission.find({problemCode})
+            
+            if(probSub.length)  result.push(probSub)
+        }
+        result.sort({timeStamp:-1})
+
+        return res.status(200).json({
+            success: true,
+            message: "Contest Submissions fetched successfully!",
+            result
+        })
+    } catch(err) {
+        return res.status(400).json({ success:false, message:err.message})
+    }
+}
+
+export const getUserContestSubmissions = async(req,res) => {
+    try {
+        const {contestCode,username} =req.params;
+
+        if(!contestCode || !username) {
+            return res.status(400).json({
+                success: false,
+                message:"Contest Code or username not provided!"
+            })
+        }
+
+        const result = []
+        for(let i=0; i<26; i++) {
+            const ch= String.fromCharCode(65+i)
+            const problemCode = contestCode+ch;
+            const probSub = await Submission.find({username:username, problemCode:problemCode})
+
+            if(probSub.length)  result.push(...probSub)
+        }
+        result.sort({timeStamp: -1})
+
+        return res.status(200).json({
+            success: true,
+            message: "User's Contest Submissions fetched successfully!",
+            result
+        })
+    } catch(err) {
+        return res.status(400).json({ success:false, message:err.message})
+    }
 }
