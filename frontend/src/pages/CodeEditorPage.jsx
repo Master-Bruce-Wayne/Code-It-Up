@@ -29,6 +29,8 @@ int main(){
                 username:userData.username, userId:userData._id
             });
 
+            // console.log("Res:",res);
+            // console.log("Res.data: ", res.data);
             if(!res.data.success) {
                 setError("Failed to submit code to backend");
             }
@@ -43,7 +45,6 @@ int main(){
     <div className="p-4 max-w-6xl mx-auto">
       <h1 className="text-xl font-bold mb-3">Code Editor</h1>
 
-      {/* Language Selector */}
       <select
         value={language}
         onChange={(e) => setLanguage(e.target.value)}
@@ -69,12 +70,11 @@ int main(){
         />
       </div>
 
-      {/* Buttons */}
       <div className="flex gap-4 mt-4">
         <button
           onClick={handleSubmit}
           disabled={loading}
-          className="px-4 py-2 bg-green-600 text-white rounded"
+          className="px-4 py-2 bg-green-600 text-white rounded hover:cursor-pointer"
         >
           {loading ? "Submitting..." : "Submit"}
         </button>
