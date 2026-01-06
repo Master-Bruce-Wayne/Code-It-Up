@@ -1,12 +1,12 @@
 import React from 'react'
 import { useEffect } from 'react';
 import { useState } from 'react';
-import { Navigate, useNavigate, useParams } from 'react-router-dom';
+import { Link,Navigate, useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '../context/User';
 
 const SubmissionsPage = () => {
     const [loading, setLoading] = useState(true);
-    const [error, setError]= useState(false);
+    const [error, setError]= useState("");
     const [submissions, setSubmissions] = useState([]);
     const { probCode,contestCode }= useParams();
     const { userData, setUserData} = useAuth();
@@ -15,18 +15,24 @@ const SubmissionsPage = () => {
     const apiUrl = import.meta.env.VITE_API_BASE_URL;
 
     useEffect(() => {
-      // console.log(userData);
-      // if(!userData)  setUserData(JSON.parse(localStorage.getItem("userData")));
-      // if (!userData) {
-      //   alert("You need to be logged in first!");
-      //   navigate('/login'); return;
-      // }
+      if (!userData) {
+        const storedUser = localStorage.getItem("userData");
+        if (storedUser) {
+          setUserData(JSON.parse(storedUser));
+        } else {
+          navigate("/login");
+        }
+      }
+    }, []);
+    useEffect(() => {
+      if(!userData)  return;
         
       const fetchSubmissions = async () => {
         try {
           if(probCode) {
             const res= await fetch(`${apiUrl}/submission/problem/${probCode}/user/${userData.username}`);
             const data=await res.json();
+            console.log("res:", res);
 
             if (!data.success) {
               setError(data.message || "Failed to import submissions!");
@@ -37,6 +43,7 @@ const SubmissionsPage = () => {
           else if(contestCode) {
             const res= await fetch(`${apiUrl}/submission/contest/${contestCode}/user/${userData.username}`);
             const data = await res.json();
+            console.log("res: ", res);
 
             if(!data.success) {
               setError(data.message || "Failed to load contest submissions");
@@ -49,6 +56,7 @@ const SubmissionsPage = () => {
           }
 
         } catch(err) {
+          console.log(err);
           setError("Failed to fetch user submissions! Try Again!");
         }
         finally {

@@ -18,6 +18,7 @@ import ContestPage from './pages/ContestPage.jsx'
 import ProblemPage from './pages/ProblemPage.jsx'
 import ProfilePage from './pages/ProfilePage.jsx'
 import SubmissionsPage from './pages/SubmissionsPage.jsx'
+import CodeEditorPage from './pages/CodeEditorPage.jsx'
 
 // admin pages
 import AddContest from './pages/admin/AddContest.jsx'
@@ -67,6 +68,9 @@ createRoot(document.getElementById('root')).render(
             <Route path="/contest/:contestCode/problem/:probCode/submissions/my"  element={<SubmissionsPage />} />
             {/* <Route path="*" element={<SubmissionRouter />} />  */}
 
+            
+            <Route path="/problemset/problem/:probCode/submit" element={<CodeEditorPage />} />
+            <Route path="/contest/:contestCode/problem/:probCode/submit"  element={<CodeEditorPage />} />
           </Routes>
           {/* <Footer /> */}
         </SubmissionProvider>

@@ -11,7 +11,7 @@ const submissionSchema =new mongoose.Schema({
 
     verdict: {
         type: String,
-        enum: ["AC", "WA", "TLE", "RE", "CE", "Pending"],
+        enum: ["AC", "WA", "TLE", "RTE", "CE", "SIGSEGV", "Pending"],
         default: "Pending"
     },
 
