@@ -10,67 +10,15 @@ import { timeStamp } from "console";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// ---------- UTIL -----------
-
+// Util functions
 const runCommand = (cmd, options = {}) =>
     new Promise((resolve, reject) => {
         exec(cmd, options, (err, stdout, stderr) => {
-        if (err) return reject(stderr || stdout || "Execution Error");
-        resolve(stdout);
+            if (err) return reject(stderr || stdout || "Execution Error");
+            resolve(stdout);
         });
     });
 
-// ---------- RUN (Custom Input) ----------
-
-export const runCode = async (req, res) => {
-    try {
-        const { code, language, input } = req.body;
-
-        if (!code || !language)
-        return res.json({ success: false, message: "Missing fields" });
-
-        const tempDir = path.join(__dirname, "../temp", uuid());
-        fs.mkdirSync(tempDir, { recursive: true });
-
-        let runFile = "";
-        let execFile = "";
-
-        if (language === "cpp") {
-        runFile = path.join(tempDir, "main.cpp");
-        execFile = path.join(tempDir, "main.exe");
-
-        fs.writeFileSync(runFile, code);
-
-        try {
-            await runCommand(`g++ "${runFile}" -o "${execFile}"`);
-        } catch {
-            return res.json({ success: false, output: "Compilation Error" });
-        }
-
-        try {
-            const result = await runCommand(`"${execFile}"`, {
-            timeout: 2000,
-            });
-
-            const process = exec(`"${execFile}"`, { timeout: 2000 }, () => {});
-            if (input) {
-            process.stdin.write(input);
-            process.stdin.end();
-            }
-
-            return res.json({ success: true, output: result });
-        } catch {
-            return res.json({ success: false, output: "Runtime Error / TLE" });
-        }
-        }
-
-        return res.json({ success: false, message: "Language not supported yet" });
-    } catch (err) {
-        return res.json({ success: false, message: err.message });
-    }
-};
-
-// Submitting Judge
 function mapRuntimeVerdict(err) {
     if (!err) return null;
 
@@ -97,12 +45,86 @@ function mapRuntimeVerdict(err) {
     return "RTE";
 }
 
+// running judge     
+export const runCode = async (req, res) => {
+    try {
+        const { code, language, input } = req.body;
+
+        if (!code || !language) {
+            return res.json({ success: false, message: "Missing fields" });
+        }
+
+        const tempDir = path.join(__dirname, "../temp", uuid());
+        fs.mkdirSync(tempDir, { recursive: true });
+
+        if (language !== "cpp") {
+            return res.json({ success: false, message: "Language not supported yet" });
+        }
+
+        const sourceFile = path.join(tempDir, "main.cpp");
+        const execFile = path.join(tempDir, "main.exe");
+
+        fs.writeFileSync(sourceFile, code);
+
+        try {
+            await runCommand(`g++ "${sourceFile}" -o "${execFile}"`);
+        } catch {
+            return res.json({
+                success: true,
+                verdict: "CE",
+                output: "Compilation Error"
+            });
+        }
+
+        try {
+            const output = await new Promise((resolve, reject) => {
+                const child = exec(
+                    `"${execFile}"`,
+                    { timeout: 2000 },
+                    (err, stdout, stderr) => {
+                        if (err) {
+                            return reject(mapRuntimeVerdict(err));
+                        }
+                        resolve(stdout);
+                    }
+                );
+
+                if (input) {
+                    child.stdin.write(input);
+                }
+                child.stdin.end();
+            });
+
+            return res.json({
+                success: true,
+                verdict: "AC",
+                output
+            });
+
+        } catch (verdict) {
+            return res.json({
+                success: true,
+                verdict,
+                output: verdict === "TLE" ? "Time Limit Exceeded" : "Runtime Error"
+            });
+        }
+
+    } catch (err) {
+        return res.json({ success: false, message: err.message });
+    }
+};
+
+// Submitting Judge
 export const submitSolution = async (req, res) => {
     try {
         const { code, language, probCode, username, userId } = req.body;
 
         if (!code || !language || !probCode || !username || !userId)
         return res.json({ success: false, message: "Missing fields" });
+
+        if (language !== "cpp") {
+            return res.json({ success: false, message: "Language not supported yet" });
+        }
 
         const problem = await Problem.findOne({ probCode });
         if (!problem)
@@ -127,7 +149,7 @@ export const submitSolution = async (req, res) => {
                 verdict: "CE"
             })
 
-            return res.json({ sucess:false, message:"Code Compiled successfully!" ,verdict:"CE"})
+            return res.json({ success:false, message:"Code Compiled successfully!" ,verdict:"CE"})
         }
         
         // finding test cases
@@ -310,7 +332,7 @@ export const getContestSubmissions = async(req,res) => {
             
             if(probSub.length)  result.push(probSub)
         }
-        result.sort({timeStamp:-1})
+        result.sort((a, b) => b.createdAt - a.createdAt);
 
         return res.status(200).json({
             success: true,
@@ -342,7 +364,7 @@ export const getUserContestSubmissions = async(req,res) => {
 
             if(probSub.length)  result.push(...probSub)
         }
-        result.sort({timeStamp: -1})
+        result.sort((a, b) => b.createdAt - a.createdAt);
 
         return res.status(200).json({
             success: true,
