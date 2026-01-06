@@ -7,7 +7,7 @@ import { useAuth } from '../context/User';
 const SubmissionsPage = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError]= useState(false);
-    const [submissions, setSubmissions] = useState(null);
+    const [submissions, setSubmissions] = useState([]);
     const { probCode,contestCode }= useParams();
     const { userData, setUserData} = useAuth();
     const navigate = useNavigate();
@@ -16,8 +16,8 @@ const SubmissionsPage = () => {
 
     useEffect(() => {
       if (!userData) {
-        // navigate('/login');
         alert("You need to be logged in first!");
+        navigate('/login'); return;
       }
         
       // console.log(probCode, contestCode, userData.username);
@@ -58,9 +58,86 @@ const SubmissionsPage = () => {
       fetchSubmissions();
     }, [userData, probCode, contestCode]);
 
+  if (loading)
+    return (
+      <h2 className="text-center text-xl font-semibold mt-10">
+        Loading Submissions...
+      </h2>
+    );
+
+  if( error)
+    return (
+      <h2 className="text-center text-red-500 text-xl mt-10">
+        {error}
+      </h2>
+    );
+
   return (
-    <div>Submissions</div>
-  )
+    <div className="w-[85%] mx-auto py-8">
+      <h1 className="text-3xl font-bold mb-6">
+        My Submissions
+      </h1>
+
+      {submissions.length === 0 ? (
+        <p className="text-gray-500">No submissions found.</p>
+      ) : (
+        <div className="overflow-x-auto border rounded-lg">
+          <table className="w-full border-collapse">
+            <thead className="bg-gray-100">
+              <tr>
+                <th className="p-3 border">#</th>
+                <th className="p-3 border">Problem</th>
+                <th className="p-3 border">Language</th>
+                <th className="p-3 border">Verdict</th>
+                <th className="p-3 border">Date & Time</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              {submissions.map((s, idx) => (
+                <tr
+                  key={s._id}
+                  className="hover:bg-gray-50 transition text-center"
+                >
+                  <td className="p-3 border">{idx + 1}</td>
+
+                  <td className="p-3 border text-blue-600 font-medium">
+                    <Link to={`/problem/${s.problemCode}`}>
+                      {s.problem?.probName || s.problemCode}
+                    </Link>
+                  </td>
+
+                  <td className="p-3 border">
+                    {s.language}
+                  </td>
+
+                  <td
+                    className={`p-3 border font-semibold ${
+                      s.verdict === "AC"
+                        ? "text-green-600"
+                        : s.verdict === "WA"
+                        ? "text-red-600"
+                        : s.verdict === "TLE"
+                        ? "text-orange-500"
+                        : s.verdict === "CE"
+                        ? "text-yellow-600"
+                        : "text-gray-600"
+                    }`}
+                  >
+                    {s.verdict}
+                  </td>
+
+                  <td className="p-3 border text-sm">
+                    {new Date(s.createdAt).toLocaleString()}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </div>
+  );
 }
 
 export default SubmissionsPage
