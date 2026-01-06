@@ -30,7 +30,7 @@ const SubmissionsPage = () => {
             if (!data.success) {
               setError(data.message || "Failed to import submissions!");
             } else {
-              setProblem(data.submissions);
+              setSubmissions(data.submissions);
             }
           }
           else if(contestCode) {
@@ -40,7 +40,7 @@ const SubmissionsPage = () => {
             if(!data.success) {
               setError(data.message || "Failed to load contest submissions");
             } else {
-              setProblem(data.result);
+              setSubmissions(data.result);
             }
           }
           else {
