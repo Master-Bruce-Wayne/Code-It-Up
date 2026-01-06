@@ -15,12 +15,13 @@ const SubmissionsPage = () => {
     const apiUrl = import.meta.env.VITE_API_BASE_URL;
 
     useEffect(() => {
-      if (!userData) {
-        alert("You need to be logged in first!");
-        navigate('/login'); return;
-      }
+      // console.log(userData);
+      // if(!userData)  setUserData(JSON.parse(localStorage.getItem("userData")));
+      // if (!userData) {
+      //   alert("You need to be logged in first!");
+      //   navigate('/login'); return;
+      // }
         
-      // console.log(probCode, contestCode, userData.username);
       const fetchSubmissions = async () => {
         try {
           if(probCode) {
@@ -56,6 +57,7 @@ const SubmissionsPage = () => {
       }
 
       fetchSubmissions();
+      // console.log(submissions);
     }, [userData, probCode, contestCode]);
 
   if (loading)
