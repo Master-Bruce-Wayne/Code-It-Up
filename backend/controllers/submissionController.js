@@ -70,75 +70,100 @@ export const runCode = async (req, res) => {
     }
 };
 
-// ---------- SUBMIT (Judge) ----------
+// Submitting Judge
+function mapRuntimeVerdict(err) {
+    if (!err) return null;
+
+    if (err.killed && err.signal === "SIGKILL") {
+        return "TLE";
+    }
+
+    if (err.signal === "SIGSEGV") {
+        return "SIGSEGV";
+    }
+
+    if (err.signal === "SIGABRT") {
+        return "RTE";
+    }
+
+    if (err.signal === "SIGFPE") {
+        return "RTE";
+    }
+
+    if (err.code !== 0) {
+        return "RTE";
+    }
+
+    return "RTE";
+}
 
 export const submitSolution = async (req, res) => {
     try {
-        const { code, language, problemId, userId } = req.body;
+        const { code, language, probCode, username, userId } = req.body;
 
-        if (!code || !language || !problemId || !userId)
+        if (!code || !language || !probCode || !username || !userId)
         return res.json({ success: false, message: "Missing fields" });
 
-        const problem = await Problem.findById(problemId);
+        const problem = await Problem.findOne({ probCode });
         if (!problem)
         return res.json({ success: false, message: "Problem not found" });
 
+        // unique dir for each submission
         const tempDir = path.join(__dirname, "../temp", uuid());
-        fs.mkdirSync(tempDir, { recursive: true });
+        fs.mkdirSync(tempDir, {recursive: true});
 
-        let sourceFile = path.join(tempDir, "main.cpp");
-        let execFile = path.join(tempDir, "main.exe");
+        let sourceFile = path.join(tempDir,"main.cpp");
+        let execFile = path.join(tempDir,"main.exe");
 
-        // ---- build ----
-        fs.writeFileSync(sourceFile, code);
+        fs.writeFileSync(sourceFile,code);
 
         try {
             await runCommand(`g++ "${sourceFile}" -o "${execFile}"`);
-        } catch {
+        } catch(err) {
             await Submission.create({
-                user: userId,
-                problem: problemId,
-                language,
-                code,
-                verdict: "CE",
-            });
-            return res.json({ success: true, verdict: "CE" });
-        }
+                user: userId, username, 
+                problem: problem._id, problemCode: probCode,
+                language, code, 
+                verdict: "CE"
+            })
 
-        // ---- judge ----
+            return res.json({ sucess:false, message:"Code Compiled successfully!" ,verdict:"CE"})
+        }
+        
+        // finding test cases
         const tcFolder = path.join(
             __dirname,
-            `../assets/judge_data/${problem.probCode}`
+            `../assets/judge_data/${probCode}`
         );
+        if(!fs.existsSync(tcFolder)){
+            return res.json({
+                success: false,
+                message: "Test cases folder does not exists for the problem"
+            })
+        };
 
-        if (!fs.existsSync(tcFolder))
-        return res.json({
-            success: false,
-            message: "Judge data not found for this problem",
-        });
-
-        const inputs = fs
-        .readdirSync(tcFolder)
-        .filter((f) => f.startsWith("input"));
+        const inputs = fs.readdirSync(tcFolder).filter((f) => f.startsWith("input"));
 
         let verdict = "AC";
 
-        for (let file of inputs) {
-            const num = file.match(/\d+/)[0];
-
+        for(let file of inputs) {
+            const tcNum = file.match(/\d+/)[0];
             const input = fs.readFileSync(
-                path.join(tcFolder, `input${num}.txt`),
+                path.join(tcFolder, `input${tcNum}.txt`), 
                 "utf8"
             );
             const expected = fs.readFileSync(
-                path.join(tcFolder, `output${num}.txt`),
+                path.join(tcFolder, `output${tcNum}.txt`),
                 "utf8"
             );
 
             try {
                 const output = await new Promise((resolve, reject) => {
-                const process = exec(`"${execFile}"`, { timeout: 2000 }, (err, stdout) => {
-                    if (err) return reject("TLE");
+                const process = exec(`"${execFile}"`, { timeout: problem.timeLimit }, (err, stdout) => {
+                    if (err) {
+                        const v = mapRuntimeVerdict(err);
+                        return reject(v);
+                    }
                     resolve(stdout);
                 });
 
@@ -150,26 +175,27 @@ export const submitSolution = async (req, res) => {
                     verdict = "WA";
                     break;
                 }
-            } catch {
-                verdict = "TLE";
-                break;
+            } catch(v) {
+                verdict = v; break;
             }
         }
 
         await Submission.create({
-            user: userId,
-            problem: problemId,
-            language,
-            code,
-            verdict,
-        });
+            user:userId, username, problem: problem._id,
+            problemCode:probCode, language, code, verdict
+        })
+        return res.json({
+            success: true,
+            message: "Submitted code successfully compiled!",
+            verdict
+        })
 
-        return res.json({ success: true, verdict });
     } catch (err) {
         return res.json({ success: false, message: err.message });
     }
 };
 
+// User All Submissions
 export const getUserSubmissions = async (req, res) => {
     try {
         const { username } = req.params;
@@ -193,6 +219,7 @@ export const getUserSubmissions = async (req, res) => {
     }
 };
 
+// A specific Problem Submissions
 export const getProblemSubmissionsById = async (req, res) => {
     try {
         const { problemId } = req.params;
@@ -239,6 +266,7 @@ export const getProblemSubmissionsByCode = async (req, res) => {
     }
 };
 
+// User submissions for problem
 export const getUserProblemSubmissions = async (req, res) => {
     try {
         const { problemCode,username } = req.params;
@@ -262,6 +290,7 @@ export const getUserProblemSubmissions = async (req, res) => {
     }
 };
 
+// Contest All Submissions
 export const getContestSubmissions = async(req,res) => {
     try {
         const {contestCode} =req.params;
@@ -293,6 +322,7 @@ export const getContestSubmissions = async(req,res) => {
     }
 }
 
+// User submissions on contest
 export const getUserContestSubmissions = async(req,res) => {
     try {
         const {contestCode,username} =req.params;
