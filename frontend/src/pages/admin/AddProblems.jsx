@@ -77,14 +77,14 @@ const AddProblems = () => {
   };
 
   return (
-    <div className="w-[90%] md:w-[70%] mx-auto py-10">
-      <h1 className="text-3xl font-bold mb-6">
+    <div className="w-full px-20 mx-auto py-10 bg-white">
+      <h1 className="text-3xl font-bold mb-6 animate-fade-in">
         Add New Problem
       </h1>
 
       <form
         onSubmit={handleSubmit(onSubmit)}
-        className="bg-white shadow p-6 rounded border space-y-6"
+        className="bg-white shadow-lg p-6 rounded-lg border border-gray-100 space-y-6 box-animate animate-scale-in"
       >
         {/* Name, Code*/}
         <div className="grid md:grid-cols-2 gap-5">
@@ -93,7 +93,7 @@ const AddProblems = () => {
               Problem Name
             </label>
             <input
-              className="w-full p-2 border rounded"
+              className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all duration-200"
               {...register("probName", {
                 required: "Problem name is required",
               })}
@@ -110,7 +110,7 @@ const AddProblems = () => {
               Problem Code
             </label>
             <input
-              className="w-full p-2 border rounded uppercase"
+              className="w-full p-3 border rounded-lg uppercase focus:ring-2 focus:ring-blue-500 outline-none transition-all duration-200"
               {...register("probCode", {
                 required: "Problem code is required",
               })}
@@ -126,7 +126,7 @@ const AddProblems = () => {
             </label>
             <input
               type="number"
-              className="w-full p-2 border rounded"
+              className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all duration-200"
               {...register("probRating", {
                 required: "Rating required",
               })}
@@ -139,7 +139,7 @@ const AddProblems = () => {
             </label>
             <input
               type="number"
-              className="w-full p-2 border rounded"
+              className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all duration-200"
               {...register("timeLimit")}
             />
           </div>
@@ -150,7 +150,7 @@ const AddProblems = () => {
             </label>
             <input
               type="number"
-              className="w-full p-2 border rounded"
+              className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all duration-200"
               {...register("memoryLimit")}
             />
           </div>
@@ -163,7 +163,7 @@ const AddProblems = () => {
           </label>
           <input
             placeholder="dp, graphs, math"
-            className="w-full p-2 border rounded"
+            className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all duration-200"
             {...register("probTags")}
           />
         </div>
@@ -174,7 +174,7 @@ const AddProblems = () => {
             Problem Statement
           </label>
           <textarea
-            className="w-full p-2 border rounded min-h-[120px]"
+            className="w-full p-3 border rounded-lg min-h-[120px] focus:ring-2 focus:ring-blue-500 outline-none transition-all duration-200"
             {...register("probStatement", {
               required: "Problem statement required",
             })}
@@ -188,7 +188,7 @@ const AddProblems = () => {
               Input Format
             </label>
             <textarea
-              className="w-full p-2 border rounded"
+              className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all duration-200"
               {...register("inputFormat", {
                 required: "Input format required",
               })}
@@ -200,7 +200,7 @@ const AddProblems = () => {
               Output Format
             </label>
             <textarea
-              className="w-full p-2 border rounded"
+              className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all duration-200"
               {...register("outputFormat", {
                 required: "Output format required",
               })}
@@ -212,7 +212,7 @@ const AddProblems = () => {
               Constraints
             </label>
             <textarea
-              className="w-full p-2 border rounded"
+              className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all duration-200"
               {...register("constraints", {
                 required: "Constraints required",
               })}
@@ -221,14 +221,14 @@ const AddProblems = () => {
         </div>
 
         {/* sample test cases */}
-        <div className="border rounded p-4">
+        <div className="border rounded-lg p-4 bg-white box-animate">
           <div className="flex justify-between items-center mb-3">
             <h2 className="text-xl font-semibold">Samples</h2>
 
             <button
               type="button"
               onClick={() => append({ input: "", output: "" })}
-              className="px-3 py-1 bg-green-600 text-white rounded"
+              className="px-4 py-2 bg-green-600 text-white rounded-lg btn-animate font-semibold"
             >
               + Add Sample
             </button>
@@ -237,13 +237,13 @@ const AddProblems = () => {
           {fields.map((field, idx) => (
             <div
               key={field.id}
-              className="border p-3 rounded mb-3 space-y-2"
+              className="border p-3 rounded-lg mb-3 space-y-2 bg-white box-animate"
             >
               <p className="font-semibold">Sample {idx + 1}</p>
 
               <textarea
                 placeholder="Sample Input"
-                className="w-full p-2 border rounded"
+                className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all duration-200"
                 {...register(`samples.${idx}.input`, {
                   required: true,
                 })}
@@ -251,7 +251,7 @@ const AddProblems = () => {
 
               <textarea
                 placeholder="Sample Output"
-                className="w-full p-2 border rounded"
+                className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all duration-200"
                 {...register(`samples.${idx}.output`, {
                   required: true,
                 })}
@@ -260,7 +260,7 @@ const AddProblems = () => {
               <button
                 type="button"
                 onClick={() => remove(idx)}
-                className="bg-red-500 text-white px-3 py-1 rounded"
+                className="bg-red-500 text-white px-4 py-2 rounded-lg btn-animate font-semibold"
               >
                 Remove
               </button>
@@ -271,7 +271,7 @@ const AddProblems = () => {
         {/* submit buttons */}
         <button
           disabled={isSubmitting}
-          className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded"
+          className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg btn-animate font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {isSubmitting ? "Creating..." : "Create Problem"}
         </button>

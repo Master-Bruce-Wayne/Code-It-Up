@@ -27,13 +27,13 @@ const Navbar = () => {
   };
 
   return (
-    <div className="w-full shadow">
+    <div className="w-full shadow-lg bg-white">
       
-      <div className="bg-gray-900 text-white h-14 flex items-center">
+      <div className="bg-gray-900 !text-white h-14 flex items-center">
         <div className="w-[90%] mx-auto flex justify-between items-center">
           
           {/* Logo */}
-          <Link to="/" className="text-xl font-bold tracking-wide">
+          <Link to="/" className="!text-white text-xl font-bold tracking-wide animate-slide-in">
             Code-It-Up
           </Link>
 
@@ -42,16 +42,16 @@ const Navbar = () => {
             <div className="relative">
               <button
                 onClick={() => setOpenMenu(!openMenu)}
-                className="bg-gray-800 px-3 py-1 rounded-md underline cursor-pointer"
+                className="bg-gray-800 px-3 py-1 rounded-md underline cursor-pointer btn-animate"
               >
                 {userData.username} ⌄ 
               </button>
 
               {openMenu && (
-                <div className="absolute right-0 mt-2 bg-white text-black shadow rounded w-36">
+                <div className="absolute right-0 mt-2 bg-white text-black shadow-lg rounded-lg w-36 animate-scale-in border border-gray-200">
                   <Link
                     to={`/profile/${userData.username}`}
-                    className="block px-3 py-2 hover:bg-gray-200"
+                    className="block px-3 py-2 hover:bg-gray-100 transition-colors duration-200 rounded-t-lg"
                     onClick={() => setOpenMenu(false)}
                   >
                     Profile
@@ -59,7 +59,7 @@ const Navbar = () => {
 
                   <button
                     onClick={handleLogout}
-                    className="w-full text-left px-3 py-2 hover:bg-gray-200"
+                    className="w-full text-left px-3 py-2 hover:bg-gray-100 transition-colors duration-200 rounded-b-lg"
                   >
                     Logout
                   </button>
@@ -69,7 +69,7 @@ const Navbar = () => {
           ) : (
             <Link
               to="/login"
-              className="bg-blue-600 px-4 py-1 rounded hover:bg-blue-700"
+              className="bg-blue-600 px-4 py-1 rounded hover:bg-blue-700 btn-animate"
             >
               Login
             </Link>
@@ -78,15 +78,15 @@ const Navbar = () => {
       </div>
 
       {/* Bottom navbar links */}
-      <div className="bg-gray-100 border-b">
+      <div className="bg-white border-b">
         <div className="w-[90%] mx-auto h-10 flex items-center gap-8">
           <NavLink
             to="/"
             end
             className={({ isActive }) =>
-              `font-medium ${
-                isActive ? "text-blue-600" : "text-gray-700"
-              } hover:text-blue-600`
+              `font-medium transition-all duration-200 ${
+                isActive ? "!text-blue-600" : "!text-gray-700"
+              } hover:text-blue-600 hover:scale-105`
             }
           >
             Home
@@ -95,9 +95,9 @@ const Navbar = () => {
           <NavLink
             to="/problemset"
             className={({ isActive }) =>
-              `font-medium ${
-                isActive ? "text-blue-600" : "text-gray-700"
-              } hover:text-blue-600`
+              `font-medium transition-all duration-200 ${
+                isActive ? "!text-blue-600" : "!text-gray-700"
+              } hover:text-blue-600 hover:scale-105`
             }
           >
             Problemset
@@ -106,9 +106,9 @@ const Navbar = () => {
           <NavLink
             to="/contests"
             className={({ isActive }) =>
-              `font-medium ${
-                isActive ? "text-blue-600" : "text-gray-700"
-              } hover:text-blue-600`
+              `font-medium transition-all duration-200 ${
+                isActive ? "!text-blue-600" : "!text-gray-700"
+              } hover:text-blue-600 hover:scale-105`
             }
           >
             Contests

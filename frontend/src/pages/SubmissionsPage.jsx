@@ -88,7 +88,7 @@ const SubmissionsPage = () => {
     );
 
   return (
-    <div className="w-[85%] mx-auto py-8">
+    <div className="w-full px-20 mx-auto py-8">
       <h1 className="text-3xl font-bold mb-6">
         My Submissions
       </h1>
