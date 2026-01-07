@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useForm, useFieldArray } from "react-hook-form";
+import { toast } from "react-toastify";
 
 const AddContest = () => {
   const apiUrl = import.meta.env.VITE_API_BASE_URL;
@@ -45,7 +46,7 @@ const AddContest = () => {
         const uData = await u.json();
         if (uData.success) setUserList(uData.users);
       } catch (err) {
-        console.log("Fetching data failed");
+        // console.log("Fetching data failed");
       }
     };
 
@@ -66,13 +67,16 @@ const AddContest = () => {
       const result = await res.json();
 
       if (!result.success) {
-        alert(result.message || "Failed to create contest");
+        // alert(result.message || "Failed to create contest");
+        toast.error("Failed to create contest");
       } else {
-        alert("Contest created successfully 🎉");
+        // alert("Contest created successfully 🎉");
+        toast.success("Contest created successfully 🎉")
         reset();
       }
     } catch (error) {
-      alert("Server error while creating contest");
+      // alert("Server error while creating contest");
+      toast.error("Server error while creating contest");
     }
   };
 

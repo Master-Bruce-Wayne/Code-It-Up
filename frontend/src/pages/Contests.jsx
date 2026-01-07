@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { toast } from "react-toastify";
 
 const Contests = () => {
   const [contests, setContests] = useState([]);
@@ -16,11 +17,13 @@ const Contests = () => {
 
         if (!data.success) {
           setError(data.message || "Failed to load contests");
+          toast.error("Failed to load contests");
         } else {
           setContests(data.contests);
         }
       } catch (err) {
         setError("Server error while fetching contests");
+        toast.error("Server error while fetching contests");
       } finally {
         setLoading(false);
       }

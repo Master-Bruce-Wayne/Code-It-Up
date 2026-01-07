@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
+import { toast } from "react-toastify";
 
 const ContestPage = () => {
   const { contestCode } = useParams();
@@ -18,6 +19,7 @@ const ContestPage = () => {
 
         if (!data.success) {
           setError(data.message || "Failed to load contest");
+          toast.error("Failed to load contest!");
           setLoading(false);
           return;
         }
@@ -28,6 +30,7 @@ const ContestPage = () => {
         await fetchProblems(data.contest.problems);
       } catch (err) {
         setError("Server error while fetching contest");
+        toast.error("Server error while fetching contest");
       } finally {
         setLoading(false);
       }
@@ -56,6 +59,7 @@ const ContestPage = () => {
         setProblems(results.filter(Boolean));
       } catch (err) {
         setError("Failed to load contest problems");
+        toast.error("Failed to load contest problems");
       }
     };
 

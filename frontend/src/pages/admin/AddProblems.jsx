@@ -2,6 +2,7 @@ import React from "react";
 import { useForm, useFieldArray } from "react-hook-form";
 import axios from "axios";
 import { useAuth } from "../../context/User.jsx";
+import { toast } from "react-toastify";
 
 const AddProblems = () => {
   const apiUrl = import.meta.env.VITE_API_BASE_URL;
@@ -36,7 +37,8 @@ const AddProblems = () => {
 
   const onSubmit = async (data) => {
     if (!userData?._id) {
-      alert("Login required. UserName missing!");
+      // alert("Login required. UserName missing!");
+      toast.warn("Login required. UserName missing!");
       return;
     }
 
@@ -59,15 +61,18 @@ const AddProblems = () => {
       );
 
       if (!res.data.success) {
-        alert(res.data.message || "Problem creation failed");
+        // alert(res.data.message || "Problem creation failed");
+        toast.error("Problem creation failed");
         return;
       }
 
-      alert("Problem created successfully 🎉");
+      // alert("Problem created successfully 🎉");
+      toast.success("Problem created successfully 🎉");
       reset();
     } catch (err) {
-      console.error(err);
-      alert("Server error while creating problem");
+      // console.error(err);
+      // alert("Server error while creating problem");
+      toast.error("Server error while creating problem");
     }
   };
 
