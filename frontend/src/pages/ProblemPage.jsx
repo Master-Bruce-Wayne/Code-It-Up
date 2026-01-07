@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useLocation, useParams } from "react-router-dom";
 // import Editor from "@monaco-editor/react"
+import { toast } from "react-toastify";
 
 const ProblemPage = () => {
   const location= useLocation();
@@ -19,11 +20,13 @@ const ProblemPage = () => {
 
         if (!data.success) {
           setError(data.message || "Failed to load problem");
+          toast.error("Failed to load problem");
         } else {
           setProblem(data.problem);
         }
       } catch (err) {
         setError("Server error while fetching problem");
+        toast.error("Server error while fetching problem");
       } finally {
         setLoading(false);
       }

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { toast } from "react-toastify";
 
 const Problemset = () => {
   const [problems, setProblems] = useState([]);
@@ -16,11 +17,13 @@ const Problemset = () => {
 
         if (!data.problems) {
           setError("Failed to load problems");
+          toast.error("Failed to load problems");
         } else {
           setProblems(data.problems);
         }
       } catch (err) {
         setError("Server error while fetching problems");
+        toast.error("Server error while fetching problems");
       } finally {
         setLoading(false);
       }

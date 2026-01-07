@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/User.jsx";
+import { toast } from "react-toastify";
 
 const Navbar = () => {
   const { userData, setUserData } = useAuth();
@@ -20,7 +21,8 @@ const Navbar = () => {
       setUserData(null);
       navigate("/login");
     } catch (err) {
-      alert("Logout failed");
+      // alert("Logout failed");
+      toast.error("Logout failed!");
     }
   };
 

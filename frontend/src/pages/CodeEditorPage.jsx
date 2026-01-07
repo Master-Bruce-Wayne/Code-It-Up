@@ -3,6 +3,7 @@ import React, { useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '../context/User.jsx';
 import Editor from "@monaco-editor/react"
+import { toast } from 'react-toastify';
 
 const CodeEditorPage = () => {
     const apiUrl = import.meta.env.VITE_API_BASE_URL;
@@ -32,10 +33,12 @@ int main(){
             // console.log("Res:",res);
             // console.log("Res.data: ", res.data);
             if(!res.data.success) {
-                setError("Failed to submit code to backend");
+              setError("Failed to submit code to backend");
+              toast.error("Failed to submit code to backend");
             }
         } catch(err){
             setError(err.message);
+            toast.error(err.message);
         } finally {
             // navigate('')
         }

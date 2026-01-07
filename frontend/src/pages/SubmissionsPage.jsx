@@ -3,6 +3,7 @@ import { useEffect } from 'react';
 import { useState } from 'react';
 import { Link,Navigate, useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '../context/User';
+import { toast } from 'react-toastify';
 
 const SubmissionsPage = () => {
     const [loading, setLoading] = useState(true);
@@ -32,10 +33,11 @@ const SubmissionsPage = () => {
           if(probCode) {
             const res= await fetch(`${apiUrl}/submission/problem/${probCode}/user/${userData.username}`);
             const data=await res.json();
-            console.log("res:", res);
+            // console.log("res:", res);
 
             if (!data.success) {
               setError(data.message || "Failed to import submissions!");
+              toast.error("Failed to import submissions!");
             } else {
               setSubmissions(data.submissions);
             }
@@ -43,21 +45,24 @@ const SubmissionsPage = () => {
           else if(contestCode) {
             const res= await fetch(`${apiUrl}/submission/contest/${contestCode}/user/${userData.username}`);
             const data = await res.json();
-            console.log("res: ", res);
+            // console.log("res: ", res);
 
             if(!data.success) {
               setError(data.message || "Failed to load contest submissions");
+              toast.error("Failed to load contest submissions!");
             } else {
               setSubmissions(data.result);
             }
           }
           else {
-            alert("No problemcode or contest code provided!")
+            // alert("No problemcode or contest code provided!")
+            toast.warn("No problem code or contest code provided!");
           }
 
         } catch(err) {
-          console.log(err);
+          // console.log(err);
           setError("Failed to fetch user submissions! Try Again!");
+          toast.error("Failed to fetch user submissions");
         }
         finally {
           setLoading(false);
