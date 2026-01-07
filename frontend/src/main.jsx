@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client'
 import {Route, Routes, BrowserRouter, useLocation} from 'react-router-dom'
 import './index.css'
 import App from './App.jsx'
+import {ToastContainer } from "react-toastify";
 
 // contexts
 import { UserProvider } from './context/User.jsx'
@@ -41,6 +42,18 @@ createRoot(document.getElementById('root')).render(
       <UserProvider>
         <SubmissionProvider>
           <Navbar />
+
+          <ToastContainer
+            position="bottom-right"
+            autoClose={2500}
+            hideProgressBar={false}
+            newestOnTop
+            closeOnClick
+            pauseOnHover
+            draggable
+            theme="light"
+          />
+
           <Routes>
             <Route path='/' element={<Home />} />
 

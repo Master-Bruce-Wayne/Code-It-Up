@@ -3,6 +3,7 @@ import { useForm } from "react-hook-form";
 import axios from "axios";
 import { useAuth } from "../context/User.jsx";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 const Register = () => {
   const { setUserData } = useAuth();
@@ -25,16 +26,19 @@ const Register = () => {
       });
 
       if (response.data.success === false) {
-        alert(response.data.message || "Registration failed!");
+        // alert(response.data.message || "Registration failed!");
+        toast.error("Registration failed!");
         navigate("/register");
         return;
       }
 
-      alert("Registration successful! Please log in.");
+      // alert("Registration successful! Please log in.");
+      toast.success("Registration successful! Please log in.")
       navigate("/login");
     } catch (err) {
-      console.error("Registration error:", err.message);
-      alert("An error occurred during registration. Please try again.");
+      // console.error("Registration error:", err.message);
+      // alert("An error occurred during registration. Please try again.");
+      toast.error("An error occurred during registration. Please try again.");
     }
   };
 

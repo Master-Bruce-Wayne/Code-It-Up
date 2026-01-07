@@ -3,6 +3,7 @@ import { useForm } from "react-hook-form";
 import axios from "axios";
 import { useAuth } from "../context/User.jsx";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify"
 
 const Login = () => {
   const { setUserData } = useAuth();
@@ -17,7 +18,8 @@ const Login = () => {
       });
 
       if (response.data.success === false) {
-        alert(response.data.message || "Login failed!");
+        // alert(response.data.message || "Login failed!");
+        toast.error("Login failed!")
         navigate("/login");
         return;
       }
@@ -33,11 +35,13 @@ const Login = () => {
 
       setUserData(userInfo);
       localStorage.setItem("userData", JSON.stringify(userInfo));
-      alert("User logged in")
+      // alert("User logged in")
+      toast.success("User logged in successfully!");
       navigate("/");
     } catch (err) {
-      console.error("Login error:", err.message);
-      alert("Error occurred while logging in. Please try again.");
+      // console.error("Login error:", err.message);
+      // alert("Error occurred while logging in. Please try again.");
+      toast.error("Error occurred while logging in. Please try again.")
     }
   };
 
