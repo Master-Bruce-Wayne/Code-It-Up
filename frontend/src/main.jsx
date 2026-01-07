@@ -85,7 +85,7 @@ createRoot(document.getElementById('root')).render(
             <Route path="/problemset/problem/:probCode/submit" element={<CodeEditorPage />} />
             <Route path="/contest/:contestCode/problem/:probCode/submit"  element={<CodeEditorPage />} />
           </Routes>
-          {/* <Footer /> */}
+          <Footer />
         </SubmissionProvider>
       </UserProvider>
     </BrowserRouter>

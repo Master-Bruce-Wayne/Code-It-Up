@@ -3,11 +3,11 @@ import { Link } from "react-router-dom";
 
 const Home = () => {
   return (
-    <div className="bg-gradient-to-b from-blue-50 to-white min-h-screen">
+    <div className="bg-gradient-to-b from-indigo-50 via-blue-50 to-white min-h-screen">
       {/* Hero Section */}
       <section className="w-[90%] mx-auto py-20">
         <div className="text-center animate-fade-in max-w-4xl mx-auto">
-          <h1 className="text-6xl font-bold mb-6 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+          <h1 className="text-6xl font-bold mb-6 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
             Master Competitive Programming
           </h1>
           
@@ -19,7 +19,7 @@ const Home = () => {
           <div className="flex justify-center gap-4 flex-wrap">
             <Link
               to="/problemset"
-              className="!text-white bg-gradient-to-r from-blue-600 via-blue-500 to-purple-600 hover:from-blue-700 hover:via-blue-600 hover:to-purple-700 px-8 py-4 rounded-xl btn-animate font-semibold text-lg shadow-lg"
+              className="!text-white bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 hover:from-indigo-700 hover:via-purple-700 hover:to-pink-700 px-8 py-4 rounded-xl btn-animate font-semibold text-lg shadow-lg"
             >
               Start Solving →
             </Link>
@@ -28,9 +28,9 @@ const Home = () => {
               to="/contests"
               className="relative px-8 py-4 rounded-xl btn-animate font-semibold text-lg overflow-hidden group"
             >
-              <span className="absolute inset-0 bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl"></span>
+              <span className="absolute inset-0 bg-gradient-to-r from-orange-500 via-red-500 to-pink-500 rounded-xl"></span>
               <span className="absolute inset-[2px] bg-white rounded-lg"></span>
-              <span className="relative bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent font-semibold">
+              <span className="relative bg-gradient-to-r from-orange-600 via-red-600 to-pink-600 bg-clip-text text-transparent font-semibold">
                 View Contests →
               </span>
             </Link>
@@ -39,18 +39,18 @@ const Home = () => {
       </section>
 
       {/* Stats Section */}
-      <section className="w-[90%] mx-auto py-12 bg-gradient-to-br from-white via-blue-50 to-purple-50 rounded-2xl shadow-lg mb-16 border border-blue-100">
+      <section className="w-[90%] mx-auto py-12 bg-gradient-to-br from-white via-indigo-50 via-purple-50 to-pink-50 rounded-2xl shadow-lg mb-16 border border-indigo-100">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
           <div className="animate-fade-in" style={{ animationDelay: '0.1s' }}>
-            <div className="text-5xl font-extrabold bg-gradient-to-r from-blue-600 to-blue-400 bg-clip-text text-transparent mb-2">1000+</div>
+            <div className="text-5xl font-extrabold bg-gradient-to-r from-teal-600 via-cyan-600 to-blue-600 bg-clip-text text-transparent mb-2">1000+</div>
             <div className="text-gray-700 font-semibold text-lg">Coding Problems</div>
           </div>
           <div className="animate-fade-in" style={{ animationDelay: '0.2s' }}>
-            <div className="text-5xl font-extrabold bg-gradient-to-r from-green-600 to-green-400 bg-clip-text text-transparent mb-2">50+</div>
+            <div className="text-5xl font-extrabold bg-gradient-to-r from-emerald-600 via-green-500 to-teal-500 bg-clip-text text-transparent mb-2">50+</div>
             <div className="text-gray-700 font-semibold text-lg">Live Contests</div>
           </div>
           <div className="animate-fade-in" style={{ animationDelay: '0.3s' }}>
-            <div className="text-5xl font-extrabold bg-gradient-to-r from-purple-600 to-purple-400 bg-clip-text text-transparent mb-2">5000+</div>
+            <div className="text-5xl font-extrabold bg-gradient-to-r from-purple-600 via-pink-600 to-rose-600 bg-clip-text text-transparent mb-2">5000+</div>
             <div className="text-gray-700 font-semibold text-lg">Active Users</div>
           </div>
         </div>
@@ -58,44 +58,44 @@ const Home = () => {
 
       {/* Features Section */}
       <section className="w-[90%] mx-auto py-12 mb-16">
-        <h2 className="text-4xl font-bold text-center mb-12 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
+        <h2 className="text-4xl font-bold text-center mb-12 bg-gradient-to-r from-cyan-600 via-indigo-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
           Why Choose Code-It-Up?
         </h2>
         
         <div className="grid md:grid-cols-3 gap-8">
-          <div className="p-8 border-2 border-gray-200 rounded-2xl shadow-sm bg-white box-animate animate-fade-in hover:border-blue-300 transition-all" style={{ animationDelay: '0.1s' }}>
-            <div className="w-16 h-16 bg-blue-100 rounded-xl flex items-center justify-center mb-4">
-              <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="p-8 border-2 border-gray-200 rounded-2xl shadow-sm bg-white box-animate animate-fade-in hover:border-cyan-300 transition-all" style={{ animationDelay: '0.1s' }}>
+            <div className="w-16 h-16 bg-gradient-to-br from-cyan-100 to-blue-100 rounded-xl flex items-center justify-center mb-4">
+              <svg className="w-8 h-8 text-cyan-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
             </div>
-            <h3 className="text-2xl font-semibold mb-3 bg-gradient-to-r from-blue-600 to-blue-400 bg-clip-text text-transparent">Solve Problems</h3>
+            <h3 className="text-2xl font-semibold mb-3 bg-gradient-to-r from-cyan-600 to-blue-500 bg-clip-text text-transparent">Solve Problems</h3>
             <p className="text-gray-600 leading-relaxed font-normal">
               Browse a comprehensive collection of coding problems organized by difficulty, tags, and topics. 
               Practice algorithms, data structures, and problem-solving techniques.
             </p>
           </div>
 
-          <div className="p-8 border-2 border-gray-200 rounded-2xl shadow-sm bg-white box-animate animate-fade-in hover:border-green-300 transition-all" style={{ animationDelay: '0.2s' }}>
-            <div className="w-16 h-16 bg-green-100 rounded-xl flex items-center justify-center mb-4">
-              <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="p-8 border-2 border-gray-200 rounded-2xl shadow-sm bg-white box-animate animate-fade-in hover:border-emerald-300 transition-all" style={{ animationDelay: '0.2s' }}>
+            <div className="w-16 h-16 bg-gradient-to-br from-emerald-100 to-teal-100 rounded-xl flex items-center justify-center mb-4">
+              <svg className="w-8 h-8 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
               </svg>
             </div>
-            <h3 className="text-2xl font-semibold mb-3 bg-gradient-to-r from-green-600 to-green-400 bg-clip-text text-transparent">Compete in Contests</h3>
+            <h3 className="text-2xl font-semibold mb-3 bg-gradient-to-r from-emerald-600 to-teal-500 bg-clip-text text-transparent">Compete in Contests</h3>
             <p className="text-gray-600 leading-relaxed font-normal">
               Participate in live coding contests, test your speed and accuracy under pressure. 
               Compete with peers and climb the leaderboard.
             </p>
           </div>
 
-          <div className="p-8 border-2 border-gray-200 rounded-2xl shadow-sm bg-white box-animate animate-fade-in hover:border-purple-300 transition-all" style={{ animationDelay: '0.3s' }}>
-            <div className="w-16 h-16 bg-purple-100 rounded-xl flex items-center justify-center mb-4">
-              <svg className="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="p-8 border-2 border-gray-200 rounded-2xl shadow-sm bg-white box-animate animate-fade-in hover:border-rose-300 transition-all" style={{ animationDelay: '0.3s' }}>
+            <div className="w-16 h-16 bg-gradient-to-br from-rose-100 to-pink-100 rounded-xl flex items-center justify-center mb-4">
+              <svg className="w-8 h-8 text-rose-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
               </svg>
             </div>
-            <h3 className="text-2xl font-semibold mb-3 bg-gradient-to-r from-purple-600 to-purple-400 bg-clip-text text-transparent">Track Progress</h3>
+            <h3 className="text-2xl font-semibold mb-3 bg-gradient-to-r from-rose-600 to-pink-500 bg-clip-text text-transparent">Track Progress</h3>
             <p className="text-gray-600 leading-relaxed font-normal">
               Monitor your submissions, analyze performance metrics, and track your improvement over time. 
               Set goals and achieve milestones.
@@ -108,7 +108,7 @@ const Home = () => {
       <section className="w-[90%] mx-auto py-12 mb-16">
         <div className="grid md:grid-cols-2 gap-8 items-center">
           <div className="animate-fade-in">
-            <h2 className="text-4xl font-bold mb-4 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
+            <h2 className="text-4xl font-bold mb-4 bg-gradient-to-r from-indigo-600 via-purple-600 via-pink-600 to-orange-600 bg-clip-text text-transparent">
               Real-Time Code Execution
             </h2>
             <p className="text-lg text-gray-600 mb-6 leading-relaxed font-normal">
@@ -136,7 +136,7 @@ const Home = () => {
               </li>
             </ul>
           </div>
-          <div className="bg-gradient-to-br from-blue-500 via-purple-600 to-pink-500 rounded-2xl p-8 text-white box-animate animate-fade-in shadow-xl">
+          <div className="bg-gradient-to-br from-orange-500 via-pink-500 to-rose-600 rounded-2xl p-8 text-white box-animate animate-fade-in shadow-xl">
             <h3 className="text-2xl font-semibold mb-4">Ready to Start?</h3>
             <p className="mb-6 !text-white/90 font-normal">
               Join our community of competitive programmers and take your coding skills to the next level.
@@ -153,7 +153,7 @@ const Home = () => {
 
       {/* CTA Section */}
       <section className="w-[90%] mx-auto py-16 mb-16 text-center">
-        <div className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 rounded-3xl p-12 !text-white animate-fade-in shadow-2xl">
+        <div className="bg-gradient-to-r from-violet-600 via-purple-600 via-fuchsia-600 to-pink-600 rounded-3xl p-12 !text-white animate-fade-in shadow-2xl">
           <h2 className="text-4xl font-bold mb-4">Ready to Level Up Your Coding Skills?</h2>
           <p className="text-xl mb-8 !text-white/90 font-normal">
             Join thousands of developers already improving on Code-It-Up
