@@ -81,18 +81,18 @@ const AddContest = () => {
   };
 
   return (
-    <div className="w-[90%] md:w-[70%] mx-auto py-10">
-      <h1 className="text-3xl font-bold mb-6">Create New Contest</h1>
+    <div className="w-full px-20 mx-auto py-10 bg-white">
+      <h1 className="text-3xl font-bold mb-6 animate-fade-in">Create New Contest</h1>
 
       <form
         onSubmit={handleSubmit(onSubmit)}
-        className="bg-white shadow p-6 rounded border space-y-6"
+        className="bg-white shadow-lg p-6 rounded-lg border border-gray-100 space-y-6 box-animate animate-scale-in"
       >
         {/* ---------- BASIC INFO ---------- */}
         <div>
           <label className="font-semibold block mb-1">Contest Name</label>
           <input
-            className="w-full p-2 border rounded"
+            className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all duration-200"
             {...register("contestName", { required: "Contest name required" })}
           />
           {errors.contestName && (
@@ -103,7 +103,7 @@ const AddContest = () => {
         <div>
           <label className="font-semibold block mb-1">Contest Code</label>
           <input
-            className="w-full p-2 border rounded uppercase"
+            className="w-full p-3 border rounded-lg uppercase focus:ring-2 focus:ring-blue-500 outline-none transition-all duration-200"
             {...register("contestCode", { required: "Contest code required" })}
           />
         </div>
@@ -112,7 +112,7 @@ const AddContest = () => {
           <label className="font-semibold block mb-1">Start Time</label>
           <input
             type="datetime-local"
-            className="w-full p-2 border rounded"
+            className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all duration-200"
             {...register("startTime", { required: "Start time required" })}
           />
         </div>
@@ -124,7 +124,7 @@ const AddContest = () => {
           <input
             type="number"
             min="1"
-            className="w-full p-2 border rounded"
+            className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all duration-200"
             {...register("duration", { required: "Duration required" })}
           />
         </div>
@@ -135,7 +135,7 @@ const AddContest = () => {
         </div>
 
         {/* ---------- PROBLEMS SECTION ---------- */}
-        <div className="border rounded p-4">
+        <div className="border rounded-lg p-4 bg-white box-animate">
           <div className="flex justify-between items-center mb-3">
             <h2 className="text-xl font-semibold">Problems</h2>
 
@@ -144,7 +144,7 @@ const AddContest = () => {
               onClick={() =>
                 append({ index: "", problemId: "" })
               }
-              className="px-3 py-1 bg-green-600 text-white rounded"
+              className="px-4 py-2 bg-green-600 text-white rounded-lg btn-animate font-semibold"
             >
               + Add Problem
             </button>
@@ -157,12 +157,12 @@ const AddContest = () => {
           {fields.map((field, idx) => (
             <div
               key={field.id}
-              className="flex flex-col md:flex-row gap-3 items-center mb-3 border p-3 rounded"
+              className="flex flex-col md:flex-row gap-3 items-center mb-3 border p-3 rounded-lg bg-white box-animate"
             >
               {/* Problem Index like A,B,C */}
               <input
                 placeholder="Index (A/B/C)"
-                className="p-2 border rounded w-full md:w-24"
+                className="p-2 border rounded-lg w-full md:w-24 focus:ring-2 focus:ring-blue-500 outline-none transition-all duration-200"
                 {...register(`problems.${idx}.index`, {
                   required: "Index required"
                 })}
@@ -170,7 +170,7 @@ const AddContest = () => {
 
               {/* Problem Select */}
               <select
-                className="p-2 border rounded w-full"
+                className="p-2 border rounded-lg w-full focus:ring-2 focus:ring-blue-500 outline-none transition-all duration-200"
                 {...register(`problems.${idx}.problemId`, {
                   required: "Select problem"
                 })}
@@ -186,7 +186,7 @@ const AddContest = () => {
               <button
                 type="button"
                 onClick={() => remove(idx)}
-                className="px-3 py-1 bg-red-500 text-white rounded"
+                className="px-4 py-2 bg-red-500 text-white rounded-lg btn-animate font-semibold"
               >
                 Remove
               </button>
@@ -195,12 +195,12 @@ const AddContest = () => {
         </div>
 
         {/* ---------- SETTERS ---------- */}
-        <div className="border rounded p-4">
+        <div className="border rounded-lg p-4 bg-white box-animate">
           <h2 className="text-xl font-semibold mb-2">Setters</h2>
 
           <select
             multiple
-            className="w-full border rounded p-2 h-32"
+            className="w-full border rounded-lg p-2 h-32 focus:ring-2 focus:ring-blue-500 outline-none transition-all duration-200"
             {...register("setters")}
           >
             {userList?.map((u) => (
@@ -212,12 +212,12 @@ const AddContest = () => {
         </div>
 
         {/* ---------- TESTERS ---------- */}
-        <div className="border rounded p-4">
+        <div className="border rounded-lg p-4 bg-white box-animate">
           <h2 className="text-xl font-semibold mb-2">Testers</h2>
 
           <select
             multiple
-            className="w-full border rounded p-2 h-32"
+            className="w-full border rounded-lg p-2 h-32 focus:ring-2 focus:ring-blue-500 outline-none transition-all duration-200"
             {...register("testers")}
           >
             {userList?.map((u) => (
@@ -231,7 +231,7 @@ const AddContest = () => {
         {/* ---------- SUBMIT ---------- */}
         <button
           disabled={isSubmitting}
-          className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded"
+          className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg btn-animate font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {isSubmitting ? "Creating..." : "Create Contest"}
         </button>

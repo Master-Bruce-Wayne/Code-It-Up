@@ -50,14 +50,14 @@ const ProblemPage = () => {
   if (!problem) return null;
 
   return (
-    <div className="w-[85%] mx-auto py-8">
+    <div className="w-full mx-auto py-8 px-20 bg-white">
 
       {/* Navbar  */}
-      <div className="flex gap-6 border-b mb-6 text-lg font-medium">
+      <div className="flex gap-6 border-b mb-6 text-lg font-medium animate-fade-in">
 
         <a
           href={location.pathname}
-          className={`pb-2 ${
+          className={`pb-2 transition-all duration-200 ${
             location.pathname.endsWith(`/problem/${probCode}`)
               ? "text-blue-600 border-b-2 border-blue-600"
               : "text-gray-600 hover:text-blue-600"
@@ -68,7 +68,7 @@ const ProblemPage = () => {
 
         <a
           href={`${location.pathname}/submit`}
-          className={`pb-2 ${
+          className={`pb-2 transition-all duration-200 ${
             location.pathname.includes("/submit")
               ? "text-blue-600 border-b-2 border-blue-600"
               : "text-gray-600 hover:text-blue-600"
@@ -79,7 +79,7 @@ const ProblemPage = () => {
 
         <a
           href={`${location.pathname}/submissions/my`}
-          className={`pb-2 ${
+          className={`pb-2 transition-all duration-200 ${
             location.pathname.includes("/submissions/my")
               ? "text-blue-600 border-b-2 border-blue-600"
               : "text-gray-600 hover:text-blue-600"
@@ -90,7 +90,7 @@ const ProblemPage = () => {
       </div>
 
       {/* Header */}
-      <div className="border-b pb-4 mb-6">
+      <div className="border-b pb-4 mb-6 animate-fade-in">
         <h1 className="text-3xl font-bold">{problem.probName}</h1>
 
         <p className="text-gray-600 text-sm mt-1">
@@ -105,7 +105,7 @@ const ProblemPage = () => {
             {problem.probTags.map((tag, i) => (
               <span
                 key={i}
-                className="px-2 py-1 text-sm bg-blue-100 text-blue-700 rounded"
+                className="px-2 py-1 text-sm bg-blue-100 text-blue-700 rounded transition-all duration-200 hover:bg-blue-200"
               >
                 {tag}
               </span>
@@ -115,7 +115,7 @@ const ProblemPage = () => {
       </div>
 
       {/* Problem Statement */}
-      <section className="mb-6">
+      <section className="mb-6 animate-fade-in box-animate p-4 rounded-lg bg-white border border-gray-100">
         <h2 className="text-xl font-semibold mb-2">
           Problem Statement
         </h2>
@@ -125,7 +125,7 @@ const ProblemPage = () => {
       </section>
 
       {/* Input Format */}
-      <section className="mb-6">
+      <section className="mb-6 animate-fade-in box-animate p-4 rounded-lg bg-white border border-gray-100">
         <h2 className="text-xl font-semibold mb-2">
           Input Format
         </h2>
@@ -135,7 +135,7 @@ const ProblemPage = () => {
       </section>
 
       {/* Output Format */}
-      <section className="mb-6">
+      <section className="mb-6 animate-fade-in box-animate p-4 rounded-lg bg-white border border-gray-100">
         <h2 className="text-xl font-semibold mb-2">
           Output Format
         </h2>
@@ -145,7 +145,7 @@ const ProblemPage = () => {
       </section>
 
       {/* Constraints */}
-      <section className="mb-6">
+      <section className="mb-6 animate-fade-in box-animate p-4 rounded-lg bg-white border border-gray-100">
         <h2 className="text-xl font-semibold mb-2">
           Constraints
         </h2>
@@ -155,7 +155,7 @@ const ProblemPage = () => {
       </section>
 
       {/* Samples */}
-      <section>
+      <section className="animate-fade-in">
         <h2 className="text-2xl font-semibold mb-3">
           Sample Tests
         </h2>
@@ -167,7 +167,7 @@ const ProblemPage = () => {
         {problem.samples?.map((s, i) => (
           <div
             key={i}
-            className="border rounded p-4 mb-4 bg-gray-50 space-y-3"
+            className="border rounded-lg p-4 mb-4 bg-white space-y-3 box-animate shadow-sm"
           >
             <p className="font-semibold">Sample {i + 1}</p>
 

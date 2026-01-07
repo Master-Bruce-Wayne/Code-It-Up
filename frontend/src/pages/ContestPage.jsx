@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useLocation } from "react-router-dom";
 import { toast } from "react-toastify";
 
 const ContestPage = () => {
   const { contestCode } = useParams();
+  const location = useLocation();
   const [contest, setContest] = useState(null);
   const [problems, setProblems] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -83,17 +84,17 @@ const ContestPage = () => {
   if (!contest) return null;
 
   return (
-    <div className="w-[85%] mx-auto py-8">
+    <div className="w-full px-20 mx-auto py-8 bg-white">
 
       {/* Navbar  */}
-      <div className="flex gap-6 border-b mb-6 text-lg font-medium">
+      <div className="flex gap-6 border-b mb-6 text-lg font-medium animate-fade-in">
 
         <a
           href={location.pathname}
-          className={`pb-2 ${
+          className={`pb-2 transition-all duration-200 ${
             location.pathname.endsWith(`/contest/${contestCode}`)
-              ? "text-blue-600 border-b-2 border-blue-600"
-              : "text-gray-600 hover:text-blue-600"
+              ? "!text-blue-600 border-b-2 border-blue-600"
+              : "!text-gray-600 hover:text-blue-600"
           }`}
         >
           Problems
@@ -101,10 +102,10 @@ const ContestPage = () => {
 
         <a
           href={`${location.pathname}/submit`}
-          className={`pb-2 ${
+          className={`pb-2 transition-all duration-200 ${
             location.pathname.includes("/submit")
-              ? "text-blue-600 border-b-2 border-blue-600"
-              : "text-gray-600 hover:text-blue-600"
+              ? "!text-blue-600 border-b-2 border-blue-600"
+              : "!text-gray-600 hover:text-blue-600"
           }`}
         >
           Submit
@@ -112,10 +113,10 @@ const ContestPage = () => {
 
         <a
           href={`${location.pathname}/submissions/my`}
-          className={`pb-2 ${
+          className={`pb-2 transition-all duration-200 ${
             location.pathname.includes("/submissions/my")
-              ? "text-blue-600 border-b-2 border-blue-600"
-              : "text-gray-600 hover:text-blue-600"
+              ? "!text-blue-600 border-b-2 border-blue-600"
+              : "!text-gray-600 hover:text-blue-600"
           }`}
         >
           My Submissions
@@ -123,7 +124,7 @@ const ContestPage = () => {
       </div>
 
       {/* Header */}
-      <div className="border-b pb-5 mb-6">
+      <div className="border-b pb-5 mb-6 animate-fade-in">
         <h1 className="text-3xl font-bold text-gray-800">
           {contest.contestName}
         </h1>
@@ -156,19 +157,19 @@ const ContestPage = () => {
       </div>
 
       {/* Problems Table */}
-      <h2 className="text-2xl font-semibold mb-4">Problems</h2>
+      <h2 className="text-2xl font-semibold mb-4 animate-fade-in">Problems</h2>
 
       {problems.length === 0 ? (
         <p className="text-gray-500">No problems found.</p>
       ) : (
-        <div className="overflow-x-auto">
-          <table className="w-full border border-gray-300 rounded-lg">
-            <thead className="bg-gray-100">
+        <div className="overflow-x-auto border rounded-lg overflow-hidden shadow-sm bg-white animate-fade-in">
+          <table className="w-full border-collapse">
+            <thead className="bg-white border-b-2 border-gray-200">
               <tr className="text-center">
-                <th className="p-3 border">Index</th>
-                <th className="p-3 border">Name</th>
-                <th className="p-3 border">Rating</th>
-                <th className="p-3 border">Solve</th>
+                <th className="p-3 border font-semibold">Index</th>
+                <th className="p-3 border font-semibold">Name</th>
+                <th className="p-3 border font-semibold">Rating</th>
+                <th className="p-3 border font-semibold">Solve</th>
               </tr>
             </thead>
 
@@ -176,18 +177,15 @@ const ContestPage = () => {
               {problems.map((p, i) => (
                 <tr
                   key={i}
-                  className="text-center border hover:bg-gray-50 transition"
+                  className="text-center border-b table-row-animate bg-white"
                 >
                   <td className="p-3 border font-semibold">{p.index}</td>
-
                   <td className="p-3 border">{p.probName}</td>
-
                   <td className="p-3 border">{p.probRating}</td>
-
                   <td className="p-3 border">
                     <Link
                       to={`/contest/${contestCode}/problem/${p.probCode}`}
-                      className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-1 rounded-md transition"
+                      className="bg-blue-600 hover:bg-blue-700 !text-white px-4 py-2 rounded-lg btn-animate inline-block"
                     >
                       Solve →
                     </Link>

@@ -46,8 +46,8 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4">
-      <div className="w-full max-w-md bg-white shadow-lg rounded-xl p-6">
+    <div className="min-h-screen flex items-center justify-center bg-white px-4">
+      <div className="w-full max-w-md bg-white shadow-xl rounded-xl p-8 box-animate animate-scale-in border border-gray-100">
         <h2 className="text-3xl font-bold text-center mb-2">
           Sign In
         </h2>
@@ -58,13 +58,13 @@ const Login = () => {
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
 
           {/* Username */}
-          <div>
+          <div className="animate-fade-in">
             <label className="font-medium">Username</label>
             <input
               type="text"
               {...register("username", { required: "Username is required" })}
               placeholder="Enter your username"
-              className="w-full mt-1 p-2 border rounded outline-blue-500"
+              className="w-full mt-1 p-3 border rounded-lg outline-blue-500 focus:ring-2 focus:ring-blue-500 transition-all duration-200"
             />
             {errors.username && (
               <p className="text-red-500 text-sm mt-1">
@@ -74,13 +74,13 @@ const Login = () => {
           </div>
 
           {/* Password */}
-          <div>
+          <div className="animate-fade-in">
             <label className="font-medium">Password</label>
             <input
               type="password"
               {...register("password", { required: "Password is required" })}
               placeholder="Enter your password"
-              className="w-full mt-1 p-2 border rounded outline-blue-500"
+              className="w-full mt-1 p-3 border rounded-lg outline-blue-500 focus:ring-2 focus:ring-blue-500 transition-all duration-200"
             />
             {errors.password && (
               <p className="text-red-500 text-sm mt-1">
@@ -92,7 +92,7 @@ const Login = () => {
           {/* Submit Button */}
           <button
             type="submit"
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-md font-semibold transition hover:cursor-pointer"
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-semibold btn-animate"
           >
             Sign In
           </button>
@@ -100,7 +100,7 @@ const Login = () => {
           {/* Signup link */}
           <p className="text-center text-gray-600">
             Don't have an account?{" "}
-            <a href="/register" className="text-blue-600 font-semibold hover:underline">
+            <a href="/register" className="text-blue-600 font-semibold hover:underline transition-colors duration-200">
               Sign up
             </a>
           </p>
