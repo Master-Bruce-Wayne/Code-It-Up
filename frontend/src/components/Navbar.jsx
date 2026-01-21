@@ -51,7 +51,7 @@ const Navbar = () => {
                 <div className="absolute right-0 mt-2 bg-white text-black shadow-lg rounded-lg w-36 animate-scale-in border border-gray-200">
                   <Link
                     to={`/profile/${userData.username}`}
-                    className="block px-3 py-2 hover:bg-gray-100 transition-colors duration-200 rounded-t-lg"
+                    className="block px-3 py-2 hover:bg-gray-100 transition-colors duration-200 rounded-t-lg hover:cursor-pointer"
                     onClick={() => setOpenMenu(false)}
                   >
                     Profile
@@ -59,7 +59,7 @@ const Navbar = () => {
 
                   <button
                     onClick={handleLogout}
-                    className="w-full text-left px-3 py-2 hover:bg-gray-100 transition-colors duration-200 rounded-b-lg"
+                    className="w-full text-left px-3 py-2 bg-red-600 hover:bg-red-800 transition-colors duration-200 rounded-b-lg hover:cursor-pointer text-white"
                   >
                     Logout
                   </button>
@@ -69,7 +69,7 @@ const Navbar = () => {
           ) : (
             <Link
               to="/login"
-              className="bg-blue-600 px-4 py-1 rounded hover:bg-blue-700 btn-animate"
+              className="bg-blue-600 px-4 py-1 rounded hover:bg-blue-700 btn-animate !text-white"
             >
               Login
             </Link>
