@@ -11,6 +11,7 @@
 }
 
 .target-cursor-dot {
+  color: blueviolet;
   position: absolute;
   left: 50%;
   top: 50%;
@@ -23,12 +24,14 @@
 }
 
 .target-cursor-corner {
+  color: blueviolet;
   position: absolute;
   left: 50%;
   top: 50%;
   width: 12px;
   height: 12px;
-  border: 3px solid #fff;
+  /* border: 3px solid #fff; */
+  border: 3px solid rgb(19, 81, 213);
   will-change: transform;
 }
 
