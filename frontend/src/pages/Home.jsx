@@ -1,9 +1,17 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import TargetCursor from '../component/TargetCursor.jsx'
 
 const Home = () => {
   return (
     <div className="bg-gradient-to-b from-indigo-50 via-blue-50 to-white min-h-screen">
+      <TargetCursor 
+        spinDuration={2}
+        hideDefaultCursor
+        parallaxOn
+        hoverDuration={0.3}
+      />
+
       {/* Hero Section */}
       <section className="w-[90%] mx-auto py-20">
         <div className="text-center animate-fade-in max-w-4xl mx-auto">
@@ -19,14 +27,14 @@ const Home = () => {
           <div className="flex justify-center gap-4 flex-wrap">
             <Link
               to="/problemset"
-              className="!text-white bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 hover:from-indigo-700 hover:via-purple-700 hover:to-pink-700 px-8 py-4 rounded-xl btn-animate font-semibold text-lg shadow-lg"
+              className="!text-white bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 hover:from-indigo-700 hover:via-purple-700 hover:to-pink-700 px-8 py-4 rounded-xl btn-animate font-semibold text-lg shadow-lg cursor-target"
             >
               Start Solving →
             </Link>
 
             <Link
               to="/contests"
-              className="relative px-8 py-4 rounded-xl btn-animate font-semibold text-lg overflow-hidden group"
+              className="cursor-target relative px-8 py-4 rounded-xl btn-animate font-semibold text-lg overflow-hidden group"
             >
               <span className="absolute inset-0 bg-gradient-to-r from-orange-500 via-red-500 to-pink-500 rounded-xl"></span>
               <span className="absolute inset-[2px] bg-white rounded-lg"></span>
@@ -63,7 +71,7 @@ const Home = () => {
         </h2>
         
         <div className="grid md:grid-cols-3 gap-8">
-          <div className="p-8 border-2 border-gray-200 rounded-2xl shadow-sm bg-white box-animate animate-fade-in hover:border-cyan-300 transition-all" style={{ animationDelay: '0.1s' }}>
+          <div className="cursor-target p-8 border-2 border-gray-200 rounded-2xl shadow-sm bg-white box-animate animate-fade-in hover:border-cyan-300 transition-all" style={{ animationDelay: '0.1s' }}>
             <div className="w-16 h-16 bg-gradient-to-br from-cyan-100 to-blue-100 rounded-xl flex items-center justify-center mb-4">
               <svg className="w-8 h-8 text-cyan-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -76,7 +84,7 @@ const Home = () => {
             </p>
           </div>
 
-          <div className="p-8 border-2 border-gray-200 rounded-2xl shadow-sm bg-white box-animate animate-fade-in hover:border-emerald-300 transition-all" style={{ animationDelay: '0.2s' }}>
+          <div className="cursor-target p-8 border-2 border-gray-200 rounded-2xl shadow-sm bg-white box-animate animate-fade-in hover:border-emerald-300 transition-all" style={{ animationDelay: '0.2s' }}>
             <div className="w-16 h-16 bg-gradient-to-br from-emerald-100 to-teal-100 rounded-xl flex items-center justify-center mb-4">
               <svg className="w-8 h-8 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
@@ -89,7 +97,7 @@ const Home = () => {
             </p>
           </div>
 
-          <div className="p-8 border-2 border-gray-200 rounded-2xl shadow-sm bg-white box-animate animate-fade-in hover:border-rose-300 transition-all" style={{ animationDelay: '0.3s' }}>
+          <div className="cursor-target p-8 border-2 border-gray-200 rounded-2xl shadow-sm bg-white box-animate animate-fade-in hover:border-rose-300 transition-all" style={{ animationDelay: '0.3s' }}>
             <div className="w-16 h-16 bg-gradient-to-br from-rose-100 to-pink-100 rounded-xl flex items-center justify-center mb-4">
               <svg className="w-8 h-8 text-rose-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
@@ -143,7 +151,7 @@ const Home = () => {
             </p>
             <Link
               to="/register"
-              className="inline-block bg-white text-gray-800 px-6 py-3 rounded-lg font-semibold btn-animate hover:shadow-lg hover:scale-105 transition-all"
+              className="cursor-target inline-block bg-white text-gray-800 px-6 py-3 rounded-lg font-semibold btn-animate hover:shadow-lg hover:scale-105 transition-all"
             >
               Get Started Free →
             </Link>
@@ -161,13 +169,13 @@ const Home = () => {
           <div className="flex justify-center gap-4 flex-wrap">
             <Link
               to="/problemset"
-              className="bg-white text-gray-800 px-8 py-4 rounded-xl btn-animate font-semibold text-lg shadow-lg hover:shadow-xl hover:scale-105 transition-all"
+              className="cursor-target bg-white text-gray-800 px-8 py-4 rounded-xl btn-animate font-semibold text-lg shadow-lg hover:shadow-xl hover:scale-105 transition-all"
             >
               Explore Problems →
             </Link>
             <Link
               to="/contests"
-              className="bg-white/10 backdrop-blur-sm border-2 border-white/30 !text-white hover:bg-white/20 px-8 py-4 rounded-xl btn-animate font-semibold text-lg transition-all"
+              className="cursor-target bg-white/10 backdrop-blur-sm border-2 border-white/30 !text-white hover:bg-white/20 px-8 py-4 rounded-xl btn-animate font-semibold text-lg transition-all"
             >
               Join Contest →
             </Link>
