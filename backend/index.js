@@ -1,7 +1,6 @@
 // const express  = require('express') 
 import express from 'express'
 import dotenv from "dotenv"
-import connectDB from './config/database.js';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 
@@ -38,12 +37,11 @@ app.get('/', (req,res) => {
 
 const startServer = async () => {
     try {
-        await connectDB()
         app.listen(PORT, "0.0.0.0",() => {
             console.log(` Server running on port ${PORT}`)
         })
     } catch (error) {
-        console.error(" MongoDB connection failed:", error)
+        console.error(" Server startup failed:", error)
         process.exit(1)
     }
 }
