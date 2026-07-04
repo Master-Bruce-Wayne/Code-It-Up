@@ -74,6 +74,16 @@ CREATE TABLE IF NOT EXISTS submissions (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
+-- 6. Contest Registrations Table
+CREATE TABLE IF NOT EXISTS contest_registrations (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    contest_id UUID REFERENCES contests(id) ON DELETE CASCADE,
+    user_id UUID REFERENCES profiles(id) ON DELETE CASCADE,
+    is_rated BOOLEAN DEFAULT TRUE,
+    registered_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    UNIQUE(contest_id, user_id)
+);
+
 -- Trigger function to automatically update 'updated_at' columns on row updates
 CREATE OR REPLACE FUNCTION update_updated_at_column()
 RETURNS TRIGGER AS $$

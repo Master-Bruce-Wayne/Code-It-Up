@@ -132,7 +132,14 @@ export const getAllContests = async (req, res) => {
             });
         }
 
-        const formattedContests = (contests || []).map(mapContestToFrontend);
+        const formattedContests = (contests || []).map(c => {
+            const mapped = mapContestToFrontend(c);
+            const upcoming = new Date(c.start_time) > new Date();
+            if (upcoming) {
+                mapped.problems = []; // Hide problem details for upcoming contests
+            }
+            return mapped;
+        });
 
         return res.status(200).json({
             success: true,
@@ -172,9 +179,15 @@ export const getContestByCode = async (req, res) => {
             });
         }
 
+        const mapped = mapContestToFrontend(contest);
+        const upcoming = new Date(contest.start_time) > new Date();
+        if (upcoming) {
+            mapped.problems = []; // Clear problems array for upcoming contests
+        }
+
         return res.status(200).json({
             success: true,
-            contest: mapContestToFrontend(contest)
+            contest: mapped
         });
 
     } catch (error) {
@@ -182,5 +195,94 @@ export const getContestByCode = async (req, res) => {
             success: false,
             message: error.message
         });
+    }
+};
+
+export const registerForContest = async (req, res) => {
+    try {
+        const { contestCode } = req.params;
+        const { userId, isRated } = req.body;
+
+        if (!userId) {
+            return res.status(400).json({ success: false, message: "User ID is required" });
+        }
+
+        // Find contest first
+        const { data: contest, error: findError } = await supabase
+            .from('contests')
+            .select('id')
+            .eq('contest_code', contestCode)
+            .maybeSingle();
+
+        if (findError || !contest) {
+            return res.status(404).json({ success: false, message: "Contest not found" });
+        }
+
+        // Insert into contest_registrations
+        const { error: registerError } = await supabase
+            .from('contest_registrations')
+            .insert([{
+                contest_id: contest.id,
+                user_id: userId,
+                is_rated: isRated !== undefined ? isRated : true
+            }]);
+
+        if (registerError) {
+            // Check if user is already registered (unique constraint violation)
+            if (registerError.code === '23505') {
+                return res.status(409).json({ success: false, message: "You are already registered for this contest." });
+            }
+            return res.status(500).json({ success: false, message: registerError.message });
+        }
+
+        return res.status(200).json({
+            success: true,
+            message: "Successfully registered for the contest!"
+        });
+
+    } catch (error) {
+        return res.status(500).json({ success: false, message: error.message });
+    }
+};
+
+export const getRegistrationStatus = async (req, res) => {
+    try {
+        const { contestCode, userId } = req.params;
+
+        if (!userId) {
+            return res.status(400).json({ success: false, message: "User ID is required" });
+        }
+
+        // Find contest first
+        const { data: contest, error: findError } = await supabase
+            .from('contests')
+            .select('id')
+            .eq('contest_code', contestCode)
+            .maybeSingle();
+
+        if (findError || !contest) {
+            return res.status(404).json({ success: false, message: "Contest not found" });
+        }
+
+        // Query registration
+        const { data: registration, error: regError } = await supabase
+            .from('contest_registrations')
+            .select('is_rated')
+            .eq('contest_id', contest.id)
+            .eq('user_id', userId)
+            .maybeSingle();
+
+        if (regError) {
+            return res.status(500).json({ success: false, message: regError.message });
+        }
+
+        return res.status(200).json({
+            success: true,
+            registered: !!registration,
+            isRated: registration ? registration.is_rated : false
+        });
+
+    } catch (error) {
+        return res.status(500).json({ success: false, message: error.message });
     }
 };

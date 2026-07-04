@@ -20,6 +20,38 @@ const mapProblemToFrontend = (p) => {
     };
 };
 
+// Helper function to get IDs of problems associated with upcoming contests
+const getRestrictedProblemIds = async () => {
+    try {
+        // Find all contests that have not started yet
+        const { data: upcomingContests, error } = await supabase
+            .from('contests')
+            .select('id')
+            .gt('start_time', new Date().toISOString());
+
+        if (error || !upcomingContests || upcomingContests.length === 0) {
+            return [];
+        }
+
+        const upcomingIds = upcomingContests.map(c => c.id);
+
+        // Find all problems linked to these upcoming contests
+        const { data: contestProblems, error: cpError } = await supabase
+            .from('contest_problems')
+            .select('problem_id')
+            .in('contest_id', upcomingIds);
+
+        if (cpError || !contestProblems) {
+            return [];
+        }
+
+        return contestProblems.map(cp => cp.problem_id);
+    } catch (err) {
+        console.error("Error fetching restricted problem IDs:", err);
+        return [];
+    }
+};
+
 export const createProblem = async(req,res) =>{
     try {
         const {
@@ -117,7 +149,9 @@ export const getAllProblems = async(req,res) => {
             return res.status(500).json({ success: false, message: error.message });
         }
 
-        const formattedProblems = (problems || []).map(mapProblemToFrontend);
+        const restrictedIds = await getRestrictedProblemIds();
+        const filteredProblems = (problems || []).filter(p => !restrictedIds.includes(p.id));
+        const formattedProblems = filteredProblems.map(mapProblemToFrontend);
 
         return res.status(200).json({
             success: true,
@@ -155,6 +189,15 @@ export const getProblemByCode = async(req,res) => {
             });
         }
 
+        // Access control: prevent leaks if linked to upcoming contests
+        const restrictedIds = await getRestrictedProblemIds();
+        if (restrictedIds.includes(problem.id)) {
+            return res.status(403).json({
+                success: false,
+                message: "This problem is part of an upcoming contest and cannot be accessed yet."
+            });
+        }
+
         return res.status(200).json({
             success: true,
             message: "Problem found",
@@ -188,6 +231,15 @@ export const getProblemById = async(req,res) => {
             return res.status(404).json({
                 success: false,
                 message: "Problem not found"
+            });
+        }
+
+        // Access control: prevent leaks if linked to upcoming contests
+        const restrictedIds = await getRestrictedProblemIds();
+        if (restrictedIds.includes(problem.id)) {
+            return res.status(403).json({
+                success: false,
+                message: "This problem is part of an upcoming contest and cannot be accessed yet."
             });
         }
 
