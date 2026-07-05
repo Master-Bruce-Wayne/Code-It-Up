@@ -3,6 +3,7 @@ import { useForm, useFieldArray } from "react-hook-form";
 import axios from "axios";
 import { useAuth } from "../../context/User.jsx";
 import { toast } from "react-toastify";
+import { Plus, Trash, PlusCircle, Server, Code2, Cpu } from "lucide-react";
 
 const AddProblems = () => {
   const apiUrl = import.meta.env.VITE_API_BASE_URL;
@@ -37,7 +38,6 @@ const AddProblems = () => {
 
   const onSubmit = async (data) => {
     if (!userData?._id) {
-      // alert("Login required. UserName missing!");
       toast.warn("Login required. UserName missing!");
       return;
     }
@@ -61,56 +61,58 @@ const AddProblems = () => {
       );
 
       if (!res.data.success) {
-        // alert(res.data.message || "Problem creation failed");
         toast.error("Problem creation failed");
         return;
       }
 
-      // alert("Problem created successfully 🎉");
       toast.success("Problem created successfully 🎉");
       reset();
     } catch (err) {
-      // console.error(err);
-      // alert("Server error while creating problem");
       toast.error("Server error while creating problem");
     }
   };
 
   return (
-    <div className="w-full px-20 mx-auto py-10 bg-white">
-      <h1 className="text-3xl font-bold mb-6 animate-fade-in">
-        Add New Problem
-      </h1>
+    <div className="w-[90%] max-w-5xl mx-auto py-12 bg-slate-950 min-h-screen">
+      <div className="mb-8 flex items-center gap-2">
+        <div className="p-2 rounded-lg bg-indigo-600/10 text-indigo-400 border border-indigo-500/20">
+          <Code2 className="size-5" />
+        </div>
+        <div>
+          <h1 className="text-3xl font-extrabold text-white tracking-tight">Add New Problem</h1>
+          <p className="text-xs text-gray-500 font-semibold uppercase tracking-wider mt-1">
+            Create standard problem instances for the public registry
+          </p>
+        </div>
+      </div>
 
       <form
         onSubmit={handleSubmit(onSubmit)}
-        className="bg-white shadow-lg p-6 rounded-lg border border-gray-100 space-y-6 box-animate animate-scale-in"
+        className="bg-slate-900/60 border border-slate-800 backdrop-blur-md p-8 rounded-3xl space-y-6 shadow-xl animate-scale-in"
       >
         {/* Name, Code*/}
-        <div className="grid md:grid-cols-2 gap-5">
-          <div>
-            <label className="font-semibold block mb-1">
-              Problem Name
-            </label>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="flex flex-col gap-1.5">
+            <label className="text-sm font-semibold text-gray-300">Problem Title</label>
             <input
-              className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all duration-200"
+              placeholder="e.g., Shortest Path Matrix"
+              className="w-full p-3 bg-slate-950 border border-slate-850 rounded-xl text-white placeholder-gray-650 focus:outline-none focus:border-indigo-500 transition-all font-medium text-sm"
               {...register("probName", {
                 required: "Problem name is required",
               })}
             />
             {errors.probName && (
-              <p className="text-red-500 text-sm">
+              <p className="text-red-500 text-xs font-semibold mt-0.5">
                 {errors.probName.message}
               </p>
             )}
           </div>
 
-          <div>
-            <label className="font-semibold block mb-1">
-              Problem Code
-            </label>
+          <div className="flex flex-col gap-1.5">
+            <label className="text-sm font-semibold text-gray-300">Problem Code</label>
             <input
-              className="w-full p-3 border rounded-lg uppercase focus:ring-2 focus:ring-blue-500 outline-none transition-all duration-200"
+              placeholder="e.g., 001A"
+              className="w-full p-3 bg-slate-950 border border-slate-850 rounded-xl text-white placeholder-gray-650 focus:outline-none focus:border-indigo-500 transition-all font-medium text-sm uppercase"
               {...register("probCode", {
                 required: "Problem code is required",
               })}
@@ -119,62 +121,54 @@ const AddProblems = () => {
         </div>
 
         {/* Rating, Limits(time & mem) */}
-        <div className="grid md:grid-cols-3 gap-5">
-          <div>
-            <label className="font-semibold block mb-1">
-              Rating
-            </label>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="flex flex-col gap-1.5">
+            <label className="text-sm font-semibold text-gray-300">Difficulty Rating</label>
             <input
               type="number"
-              className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all duration-200"
+              placeholder="e.g., 1200"
+              className="w-full p-3 bg-slate-950 border border-slate-850 rounded-xl text-white placeholder-gray-650 focus:outline-none focus:border-indigo-500 transition-all font-medium text-sm"
               {...register("probRating", {
                 required: "Rating required",
               })}
             />
           </div>
 
-          <div>
-            <label className="font-semibold block mb-1">
-              Time Limit (ms)
-            </label>
+          <div className="flex flex-col gap-1.5">
+            <label className="text-sm font-semibold text-gray-300">Time Limit (ms)</label>
             <input
               type="number"
-              className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all duration-200"
+              className="w-full p-3 bg-slate-950 border border-slate-850 rounded-xl text-white focus:outline-none focus:border-indigo-500 transition-all font-medium text-sm"
               {...register("timeLimit")}
             />
           </div>
 
-          <div>
-            <label className="font-semibold block mb-1">
-              Memory Limit (MB)
-            </label>
+          <div className="flex flex-col gap-1.5">
+            <label className="text-sm font-semibold text-gray-300">Memory Limit (MB)</label>
             <input
               type="number"
-              className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all duration-200"
+              className="w-full p-3 bg-slate-950 border border-slate-850 rounded-xl text-white focus:outline-none focus:border-indigo-500 transition-all font-medium text-sm"
               {...register("memoryLimit")}
             />
           </div>
         </div>
 
         {/* Tags */}
-        <div>
-          <label className="font-semibold block mb-1">
-            Tags (comma separated)
-          </label>
+        <div className="flex flex-col gap-1.5">
+          <label className="text-sm font-semibold text-gray-300">Tags (comma separated)</label>
           <input
             placeholder="dp, graphs, math"
-            className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all duration-200"
+            className="w-full p-3 bg-slate-950 border border-slate-850 rounded-xl text-white placeholder-gray-600 focus:outline-none focus:border-indigo-500 transition-all font-medium text-sm"
             {...register("probTags")}
           />
         </div>
 
         {/* prob statement */}
-        <div>
-          <label className="font-semibold block mb-1">
-            Problem Statement
-          </label>
+        <div className="flex flex-col gap-1.5">
+          <label className="text-sm font-semibold text-gray-300">Problem Statement</label>
           <textarea
-            className="w-full p-3 border rounded-lg min-h-[120px] focus:ring-2 focus:ring-blue-500 outline-none transition-all duration-200"
+            placeholder="Describe the problem details and background context..."
+            className="w-full p-3 bg-slate-950 border border-slate-850 rounded-xl text-white placeholder-gray-600 focus:outline-none focus:border-indigo-500 transition-all font-medium text-sm min-h-[120px]"
             {...register("probStatement", {
               required: "Problem statement required",
             })}
@@ -182,37 +176,34 @@ const AddProblems = () => {
         </div>
 
         {/* prob constraints */}
-        <div className="grid md:grid-cols-3 gap-5">
-          <div>
-            <label className="font-semibold block mb-1">
-              Input Format
-            </label>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="flex flex-col gap-1.5">
+            <label className="text-sm font-semibold text-gray-300">Input Format</label>
             <textarea
-              className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all duration-200"
+              placeholder="Describe variables read from stdin..."
+              className="w-full p-3 bg-slate-950 border border-slate-850 rounded-xl text-white placeholder-gray-600 focus:outline-none focus:border-indigo-500 transition-all font-medium text-sm min-h-[100px]"
               {...register("inputFormat", {
                 required: "Input format required",
               })}
             />
           </div>
 
-          <div>
-            <label className="font-semibold block mb-1">
-              Output Format
-            </label>
+          <div className="flex flex-col gap-1.5">
+            <label className="text-sm font-semibold text-gray-300">Output Format</label>
             <textarea
-              className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all duration-200"
+              placeholder="Describe outputs printed to stdout..."
+              className="w-full p-3 bg-slate-950 border border-slate-850 rounded-xl text-white placeholder-gray-600 focus:outline-none focus:border-indigo-500 transition-all font-medium text-sm min-h-[100px]"
               {...register("outputFormat", {
                 required: "Output format required",
               })}
             />
           </div>
 
-          <div>
-            <label className="font-semibold block mb-1">
-              Constraints
-            </label>
+          <div className="flex flex-col gap-1.5">
+            <label className="text-sm font-semibold text-gray-300">Constraints</label>
             <textarea
-              className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all duration-200"
+              placeholder="e.g., 1 <= N <= 10^5"
+              className="w-full p-3 bg-slate-950 border border-slate-850 rounded-xl text-white placeholder-gray-600 focus:outline-none focus:border-indigo-500 transition-all font-medium text-sm min-h-[100px]"
               {...register("constraints", {
                 required: "Constraints required",
               })}
@@ -221,59 +212,66 @@ const AddProblems = () => {
         </div>
 
         {/* sample test cases */}
-        <div className="border rounded-lg p-4 bg-white box-animate">
-          <div className="flex justify-between items-center mb-3">
-            <h2 className="text-xl font-semibold">Samples</h2>
+        <div className="border border-slate-850 bg-slate-950/40 p-6 rounded-2xl space-y-4">
+          <div className="flex justify-between items-center">
+            <h2 className="text-lg font-bold text-white tracking-tight flex items-center gap-1.5">
+              <Cpu className="size-4.5 text-indigo-400" />
+              Sample Test Cases
+            </h2>
 
             <button
               type="button"
               onClick={() => append({ input: "", output: "" })}
-              className="px-4 py-2 bg-green-600 text-white rounded-lg btn-animate font-semibold"
+              className="flex items-center gap-1 px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl btn-animate font-bold text-xs cursor-target shadow-md shadow-indigo-600/10"
             >
-              + Add Sample
+              <PlusCircle className="size-3.5" />
+              Add Sample
             </button>
           </div>
 
           {fields.map((field, idx) => (
             <div
               key={field.id}
-              className="border p-3 rounded-lg mb-3 space-y-2 bg-white box-animate"
+              className="border border-slate-850 p-4 rounded-xl space-y-3 bg-slate-900/30"
             >
-              <p className="font-semibold">Sample {idx + 1}</p>
+              <div className="flex justify-between items-center">
+                <span className="text-sm font-bold text-gray-400">Sample Case #{idx + 1}</span>
+                <button
+                  type="button"
+                  onClick={() => remove(idx)}
+                  className="flex items-center gap-1 text-xs font-bold text-rose-400 hover:text-rose-300 hover:underline cursor-target"
+                >
+                  <Trash className="size-3.5" />
+                  Remove
+                </button>
+              </div>
 
               <textarea
-                placeholder="Sample Input"
-                className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all duration-200"
+                placeholder="Sample Input (stdin)"
+                className="w-full p-3 bg-slate-950 border border-slate-850 rounded-xl text-white placeholder-gray-650 focus:outline-none focus:border-indigo-500 transition-all font-mono text-xs min-h-[80px]"
                 {...register(`samples.${idx}.input`, {
                   required: true,
                 })}
               />
 
               <textarea
-                placeholder="Sample Output"
-                className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all duration-200"
+                placeholder="Expected Output (stdout)"
+                className="w-full p-3 bg-slate-950 border border-slate-850 rounded-xl text-white placeholder-gray-650 focus:outline-none focus:border-indigo-500 transition-all font-mono text-xs min-h-[80px]"
                 {...register(`samples.${idx}.output`, {
                   required: true,
                 })}
               />
-
-              <button
-                type="button"
-                onClick={() => remove(idx)}
-                className="bg-red-500 text-white px-4 py-2 rounded-lg btn-animate font-semibold"
-              >
-                Remove
-              </button>
             </div>
           ))}
         </div>
 
-        {/* submit buttons */}
+        {/* submit button */}
         <button
           disabled={isSubmitting}
-          className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg btn-animate font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
+          className="flex items-center gap-1.5 bg-indigo-600 hover:bg-indigo-500 text-white px-6 py-3 rounded-xl font-bold transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-indigo-600/10 hover:-translate-y-0.5 active:translate-y-0 cursor-target text-sm mt-4"
         >
-          {isSubmitting ? "Creating..." : "Create Problem"}
+          <Server className="size-4" />
+          {isSubmitting ? "Creating problem..." : "Create Problem"}
         </button>
       </form>
     </div>
