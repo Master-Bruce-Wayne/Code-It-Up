@@ -2,13 +2,37 @@ import fs from "fs";
 import path from "path";
 import { exec } from "child_process";
 import { fileURLToPath } from "url";
-import { Submission } from "../models/submissionModel.js";
-import { Problem } from "../models/problemModel.js";
+import { supabase } from "../config/supabase.js";
 import { v4 as uuid } from "uuid";
-import { timeStamp } from "console";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
+// Helper to map submission db row to frontend camelCase format
+const mapSubmissionToFrontend = (s) => {
+    if (!s) return null;
+    return {
+        _id: s.id,
+        user: s.profiles ? {
+            _id: s.user_id,
+            username: s.profiles.username,
+            email: s.profiles.email
+        } : s.user_id,
+        username: s.username,
+        problem: s.problems ? {
+            _id: s.problem_id,
+            probName: s.problems.prob_name,
+            probCode: s.problems.prob_code
+        } : s.problem_id,
+        problemCode: s.problem_code,
+        language: s.language,
+        code: s.code,
+        verdict: s.verdict,
+        timeTaken: s.time_taken,
+        memoryUsed: s.memory_used,
+        createdAt: s.created_at
+    };
+};
 
 // Util functions
 const runCommand = (cmd, options = {}) =>
@@ -120,15 +144,22 @@ export const submitSolution = async (req, res) => {
         const { code, language, probCode, username, userId } = req.body;
 
         if (!code || !language || !probCode || !username || !userId)
-        return res.json({ success: false, message: "Missing fields" });
+            return res.json({ success: false, message: "Missing fields" });
 
         if (language !== "cpp") {
             return res.json({ success: false, message: "Language not supported yet" });
         }
 
-        const problem = await Problem.findOne({ probCode });
-        if (!problem)
-        return res.json({ success: false, message: "Problem not found" });
+        // Fetch problem from Supabase
+        const { data: problem, error: pError } = await supabase
+            .from('problems')
+            .select('*')
+            .eq('prob_code', probCode)
+            .maybeSingle();
+
+        if (pError || !problem) {
+            return res.json({ success: false, message: "Problem not found" });
+        }
 
         // unique dir for each submission
         const tempDir = path.join(__dirname, "../temp", uuid());
@@ -142,14 +173,18 @@ export const submitSolution = async (req, res) => {
         try {
             await runCommand(`g++ "${sourceFile}" -o "${execFile}"`);
         } catch(err) {
-            await Submission.create({
-                user: userId, username, 
-                problem: problem._id, problemCode: probCode,
-                language, code, 
+            // Save CE submission in Supabase
+            await supabase.from('submissions').insert([{
+                user_id: userId,
+                username,
+                problem_id: problem.id,
+                problem_code: probCode,
+                language,
+                code,
                 verdict: "CE"
-            })
+            }]);
 
-            return res.json({ success:false, message:"Code Compiled successfully!" ,verdict:"CE"})
+            return res.json({ success:false, message:"Code compiled with errors." ,verdict:"CE"})
         }
         
         // finding test cases
@@ -160,7 +195,7 @@ export const submitSolution = async (req, res) => {
         if(!fs.existsSync(tcFolder)){
             return res.json({
                 success: false,
-                message: "Test cases folder does not exists for the problem"
+                message: "Test cases folder does not exist for the problem"
             })
         };
 
@@ -181,16 +216,16 @@ export const submitSolution = async (req, res) => {
 
             try {
                 const output = await new Promise((resolve, reject) => {
-                const process = exec(`"${execFile}"`, { timeout: problem.timeLimit }, (err, stdout) => {
-                    if (err) {
-                        const v = mapRuntimeVerdict(err);
-                        return reject(v);
-                    }
-                    resolve(stdout);
-                });
+                    const process = exec(`"${execFile}"`, { timeout: problem.time_limit }, (err, stdout) => {
+                        if (err) {
+                            const v = mapRuntimeVerdict(err);
+                            return reject(v);
+                        }
+                        resolve(stdout);
+                    });
 
-                process.stdin.write(input);
-                process.stdin.end();
+                    process.stdin.write(input);
+                    process.stdin.end();
                 });
 
                 if (output.trim() !== expected.trim()) {
@@ -202,10 +237,17 @@ export const submitSolution = async (req, res) => {
             }
         }
 
-        await Submission.create({
-            user:userId, username, problem: problem._id,
-            problemCode:probCode, language, code, verdict
-        })
+        // Insert final submission in Supabase
+        await supabase.from('submissions').insert([{
+            user_id: userId,
+            username,
+            problem_id: problem.id,
+            problem_code: probCode,
+            language,
+            code,
+            verdict
+        }]);
+
         return res.json({
             success: true,
             message: "Submitted code successfully compiled!",
@@ -223,17 +265,24 @@ export const getUserSubmissions = async (req, res) => {
         const { username } = req.params;
 
         if (!username)
-        return res.json({ success: false, message: "User ID required" });
+            return res.json({ success: false, message: "User ID required" });
 
-        const submissions = await Submission
-        .find({ username: username })
-        .populate("problem", "probName probCode")
-        .sort({ createdAt: -1 });
+        const { data: submissions, error } = await supabase
+            .from('submissions')
+            .select('*, problems(prob_name, prob_code)')
+            .eq('username', username)
+            .order('created_at', { ascending: false });
+
+        if (error) {
+            return res.json({ success: false, message: error.message });
+        }
+
+        const formattedSubmissions = (submissions || []).map(mapSubmissionToFrontend);
 
         return res.json({
             success: true,
-            count: submissions.length,
-            submissions
+            count: formattedSubmissions.length,
+            submissions: formattedSubmissions
         });
 
     } catch (err) {
@@ -247,17 +296,24 @@ export const getProblemSubmissionsById = async (req, res) => {
         const { problemId } = req.params;
 
         if (!problemId)
-        return res.json({ success: false, message: "Problem ID required" });
+            return res.json({ success: false, message: "Problem ID required" });
 
-        const submissions = await Submission
-        .find({ problem: problemId })
-        .populate("user", "username email")
-        .sort({ createdAt: -1 });
+        const { data: submissions, error } = await supabase
+            .from('submissions')
+            .select('*, profiles(username, email)')
+            .eq('problem_id', problemId)
+            .order('created_at', { ascending: false });
+
+        if (error) {
+            return res.json({ success: false, message: error.message });
+        }
+
+        const formattedSubmissions = (submissions || []).map(mapSubmissionToFrontend);
 
         return res.json({
             success: true,
-            count: submissions.length,
-            submissions
+            count: formattedSubmissions.length,
+            submissions: formattedSubmissions
         });
 
     } catch (err) {
@@ -270,17 +326,24 @@ export const getProblemSubmissionsByCode = async (req, res) => {
         const { problemCode } = req.params;
 
         if (!problemCode)
-        return res.json({ success: false, message: "Problem Code required" });
+            return res.json({ success: false, message: "Problem Code required" });
 
-        const submissions = await Submission
-        .find({ problemCode: problemCode })
-        .populate("user", "username email")
-        .sort({ createdAt: -1 });
+        const { data: submissions, error } = await supabase
+            .from('submissions')
+            .select('*, profiles(username, email)')
+            .eq('problem_code', problemCode)
+            .order('created_at', { ascending: false });
+
+        if (error) {
+            return res.json({ success: false, message: error.message });
+        }
+
+        const formattedSubmissions = (submissions || []).map(mapSubmissionToFrontend);
 
         return res.json({
             success: true,
-            count: submissions.length,
-            submissions
+            count: formattedSubmissions.length,
+            submissions: formattedSubmissions
         });
 
     } catch (err) {
@@ -294,17 +357,25 @@ export const getUserProblemSubmissions = async (req, res) => {
         const { problemCode,username } = req.params;
 
         if (!problemCode || !username)
-        return res.json({ success: false, message: "Problem Code and username required" });
+            return res.json({ success: false, message: "Problem Code and username required" });
 
-        const submissions = await Submission
-        .find({ username, problemCode })
-        .populate("user", "username email")
-        .sort({ createdAt: -1 });
+        const { data: submissions, error } = await supabase
+            .from('submissions')
+            .select('*, profiles(username, email)')
+            .eq('username', username)
+            .eq('problem_code', problemCode)
+            .order('created_at', { ascending: false });
+
+        if (error) {
+            return res.json({ success: false, message: error.message });
+        }
+
+        const formattedSubmissions = (submissions || []).map(mapSubmissionToFrontend);
 
         return res.json({
             success: true,
-            count: submissions.length,
-            submissions
+            count: formattedSubmissions.length,
+            submissions: formattedSubmissions
         });
 
     } catch (err) {
@@ -324,15 +395,45 @@ export const getContestSubmissions = async(req,res) => {
             })
         }
 
-        const result = []
-        for(let i=0; i<26; i++) {
-            const ch= String.fromCharCode(65+i);
-            const problemCode = contestCode+ch;
-            const probSub = await Submission.find({problemCode})
-            
-            if(probSub.length)  result.push(probSub)
+        const { data: submissions, error } = await supabase
+            .from('submissions')
+            .select('*')
+            .like('problem_code', `${contestCode}%`);
+
+        if (error) {
+            return res.status(500).json({ success: false, message: error.message });
         }
-        result.sort((a, b) => b.createdAt - a.createdAt);
+
+        const grouped = {};
+        for (const s of submissions || []) {
+            const formatted = {
+                _id: s.id,
+                user: s.user_id,
+                username: s.username,
+                problem: s.problem_id,
+                problemCode: s.problem_code,
+                language: s.language,
+                code: s.code,
+                verdict: s.verdict,
+                timeTaken: s.time_taken,
+                memoryUsed: s.memory_used,
+                createdAt: s.created_at
+            };
+            if (!grouped[s.problem_code]) {
+                grouped[s.problem_code] = [];
+            }
+            grouped[s.problem_code].push(formatted);
+        }
+
+        const result = [];
+        for (let i = 0; i < 26; i++) {
+            const ch = String.fromCharCode(65 + i);
+            const pCode = contestCode + ch;
+            if (grouped[pCode] && grouped[pCode].length > 0) {
+                grouped[pCode].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+                result.push(grouped[pCode]);
+            }
+        }
 
         return res.status(200).json({
             success: true,
@@ -356,15 +457,30 @@ export const getUserContestSubmissions = async(req,res) => {
             })
         }
 
-        const result = []
-        for(let i=0; i<26; i++) {
-            const ch= String.fromCharCode(65+i)
-            const problemCode = contestCode+ch;
-            const probSub = await Submission.find({username:username, problemCode:problemCode})
+        const { data: submissions, error } = await supabase
+            .from('submissions')
+            .select('*')
+            .eq('username', username)
+            .like('problem_code', `${contestCode}%`)
+            .order('created_at', { ascending: false });
 
-            if(probSub.length)  result.push(...probSub)
+        if (error) {
+            return res.status(500).json({ success: false, message: error.message });
         }
-        result.sort((a, b) => b.createdAt - a.createdAt);
+
+        const result = (submissions || []).map(s => ({
+            _id: s.id,
+            user: s.user_id,
+            username: s.username,
+            problem: s.problem_id,
+            problemCode: s.problem_code,
+            language: s.language,
+            code: s.code,
+            verdict: s.verdict,
+            timeTaken: s.time_taken,
+            memoryUsed: s.memory_used,
+            createdAt: s.created_at
+        }));
 
         return res.status(200).json({
             success: true,

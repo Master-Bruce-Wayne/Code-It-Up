@@ -1,11 +1,10 @@
-import { User } from "../models/userModel.js"
+import { supabase } from "../config/supabase.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
 export const register = async(req,res)=> {
     try {
         const {username,email,password,confirmPassword} = req.body;
-        // console.log("req body: ",req.body);
         if(!username || !email || !password || !confirmPassword) {
             return res.status(400).json({success:false, message:"All fields are required"});
         }
@@ -14,33 +13,61 @@ export const register = async(req,res)=> {
             return res.status(400).json({success:false, message:"Password do not match"});
         }
 
-        const user = await User.findOne({username});
-        if(user) {
+        // Check if username already exists
+        const { data: existingUser, error: findError } = await supabase
+            .from('profiles')
+            .select('id')
+            .eq('username', username)
+            .maybeSingle();
+
+        if (findError) {
+            return res.status(500).json({success:false, message: findError.message});
+        }
+        if(existingUser) {
             return res.status(400).json({success:false, message:"Username already exists!"});
         }
 
         const hashedPassword = await bcrypt.hash(password,10);
-        await User.create({
-            username, email, password:hashedPassword
-        });
+        
+        const { error: insertError } = await supabase
+            .from('profiles')
+            .insert([{
+                username, 
+                email, 
+                password: hashedPassword
+            }]);
+
+        if (insertError) {
+            return res.status(500).json({success:false, message: insertError.message});
+        }
+
         return res.status(201).json({
             message:"Account created successfully.",
             success:true
         })
     } catch(err) {
         console.log(err);
+        return res.status(500).json({success:false, message: err.message});
     }
 };
 
 export const login = async(req,res) => {
     try{
         const {username,password} = req.body;
-        // console.log("req body: ",req.body);
         if(!username || !password) {
             return res.status(400).json({success:false, message:"All fields are required"});
         };
 
-        const user = await User.findOne({username});
+        // Query profiles table
+        const { data: user, error: findError } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('username', username)
+            .maybeSingle();
+
+        if (findError) {
+            return res.status(500).json({success:false, message: findError.message});
+        }
         if(!user) {
             return res.status(400).json({
                 message:"Incorrect username or password",
@@ -56,7 +83,7 @@ export const login = async(req,res) => {
             })
         };
         const tokenData={
-            userId:user._id
+            userId:user.id
         };
         const token = await jwt.sign(tokenData, process.env.JWT_SECRET_KEY, {expiresIn:'1d'});
 
@@ -64,16 +91,17 @@ export const login = async(req,res) => {
             maxAge:1*24*60*60*1000, httpOnly:true, sameSite:'strict'
         }).json({
             success:true,
-            _id:user._id,
+            _id:user.id,
             username:user.username,
-            fullName:user.fullName,
+            fullName:user.full_name,
             email:user.email,
-            profilePhoto:user.profilePhoto,
+            profilePhoto:user.profile_photo,
             affiliation:user.affiliation
         });
 
     } catch(err) {
         console.log(err);
+        return res.status(500).json({success:false, message: err.message});
     }
 }
 
@@ -81,20 +109,34 @@ export const updateProfileInfo = async(req,res) =>{
     try{
         const {username, fullName,profilePhoto, affiliation} = req.body;
         if(!username) {
-            return res.status(400).json({success:false, message:"Username return karde backend me saath me"});
+            return res.status(400).json({success:false, message:"Username is required"});
         }
 
-        const user = await User.findOne({username});
-        if(!user) {
-            return res.status(400).json({
-                message:"Incorrect username or password",
-                success:false
-            })
-        };
+        const { data: user, error: findError } = await supabase
+            .from('profiles')
+            .select('id')
+            .eq('username', username)
+            .maybeSingle();
 
-        await User.updateOne({
-            fullName: fullName, profilePhoto: profilePhoto, affiliation: affiliation
-        });
+        if (findError || !user) {
+            return res.status(400).json({
+                message: "User not found",
+                success: false
+            });
+        }
+
+        const { error: updateError } = await supabase
+            .from('profiles')
+            .update({
+                full_name: fullName, 
+                profile_photo: profilePhoto, 
+                affiliation: affiliation
+            })
+            .eq('username', username);
+
+        if (updateError) {
+            return res.status(500).json({success:false, message: updateError.message});
+        }
 
         return res.status(200).json({
             success:true,
@@ -103,6 +145,7 @@ export const updateProfileInfo = async(req,res) =>{
 
     } catch(err) {
         console.log(err);
+        return res.status(500).json({success:false, message: err.message});
     }
 }
 
@@ -114,21 +157,44 @@ export const logout = async(req,res) => {
         })
     } catch(err) {
         console.log(err);
+        return res.status(500).json({success:false, message: err.message});
     }
 }
 
 export const getAllUsers = async(req,res) => {
     try {
-        const users=await User.find({});
+        const { data: users, error } = await supabase
+            .from('profiles')
+            .select('*');
+
+        if (error) {
+            return res.status(500).json({
+                success: false,
+                message: "Failed to return users"
+            });
+        }
+
+        // Map database fields to frontend fields
+        const mappedUsers = users.map(u => ({
+            _id: u.id,
+            username: u.username,
+            fullName: u.full_name,
+            email: u.email,
+            profilePhoto: u.profile_photo,
+            affiliation: u.affiliation,
+            current_rating: u.current_rating,
+            max_rating: u.max_rating
+        }));
+
         return res.status(200).json({
             success:true,
             message:"Users fetched",
-            users
+            users: mappedUsers
         })
     } catch(err) {
-        return res.status(200).json({
+        return res.status(500).json({
             success:false,
-            message:"Failed to return users"
+            message: err.message
         })
     }
 }
