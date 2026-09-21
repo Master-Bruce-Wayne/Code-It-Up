@@ -13,18 +13,22 @@ export const register = async(req,res)=> {
             return res.status(400).json({success:false, message:"Password do not match"});
         }
 
-        // Check if username already exists
-        const { data: existingUser, error: findError } = await supabase
+        // Check if username or email already exists
+        const { data: existingUsers, error: findError } = await supabase
             .from('profiles')
-            .select('id')
-            .eq('username', username)
-            .maybeSingle();
+            .select('id, username, email')
+            .or(`username.eq.${username},email.eq.${email}`);
 
         if (findError) {
             return res.status(500).json({success:false, message: findError.message});
         }
-        if(existingUser) {
-            return res.status(400).json({success:false, message:"Username already exists!"});
+        if(existingUsers && existingUsers.length > 0) {
+            if (existingUsers.some(u => u.username === username)) {
+                return res.status(400).json({success:false, message:"Username already exists!"});
+            }
+            if (existingUsers.some(u => u.email === email)) {
+                return res.status(400).json({success:false, message:"Email already exists!"});
+            }
         }
 
         const hashedPassword = await bcrypt.hash(password,10);

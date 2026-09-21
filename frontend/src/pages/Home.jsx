@@ -132,6 +132,22 @@ const Home = () => {
   return (
     <div className="relative min-h-screen bg-canvas bg-grain overflow-hidden blueprint-grid">
       
+      {/* Floating Blueprint Cubes */}
+      <div className="hidden lg:block absolute top-[150px] left-[200px] size-3 bg-lime border border-ink animate-float-y" style={{ animationDelay: '0s' }} />
+      <div className="hidden lg:block absolute top-[450px] left-[600px] size-3 bg-lime border border-ink animate-float-y" style={{ animationDelay: '1.5s' }} />
+      <div className="hidden lg:block absolute top-[250px] left-[900px] size-3 bg-lime border border-ink animate-float-y" style={{ animationDelay: '3s' }} />
+      <div className="hidden lg:block absolute top-[700px] left-[1200px] size-3 bg-lime border border-ink animate-float-y" style={{ animationDelay: '0.8s' }} />
+      <div className="hidden lg:block absolute top-[1050px] left-[300px] size-3 bg-lime border border-ink animate-float-y" style={{ animationDelay: '2.2s' }} />
+      <div className="hidden lg:block absolute top-[1300px] left-[1000px] size-3 bg-lime border border-ink animate-float-y" style={{ animationDelay: '4.1s' }} />
+      
+      {/* Lower section cubes (Features & FAQ) */}
+      <div className="hidden lg:block absolute top-[1650px] left-[200px] size-3 bg-lime border border-ink animate-float-y" style={{ animationDelay: '1.2s' }} />
+      <div className="hidden lg:block absolute top-[1800px] left-[800px] size-3 bg-lime border border-ink animate-float-y" style={{ animationDelay: '3.7s' }} />
+      <div className="hidden lg:block absolute top-[2100px] left-[1100px] size-3 bg-lime border border-ink animate-float-y" style={{ animationDelay: '0.5s' }} />
+      <div className="hidden lg:block absolute top-[2300px] left-[400px] size-3 bg-lime border border-ink animate-float-y" style={{ animationDelay: '2.8s' }} />
+      <div className="hidden lg:block absolute top-[2600px] left-[900px] size-3 bg-lime border border-ink animate-float-y" style={{ animationDelay: '5.2s' }} />
+      <div className="hidden lg:block absolute top-[2800px] left-[200px] size-3 bg-lime border border-ink animate-float-y" style={{ animationDelay: '1.9s' }} />
+
       {/* --- HERO SECTION --- */}
       <section className="relative w-[90%] max-w-7xl mx-auto py-24 md:py-32 grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
         {/* Left Side: Content */}
@@ -172,13 +188,18 @@ const Home = () => {
       </section>
 
       {/* --- TECH STACK SCROLL TICKER --- */}
-      <section className="border-y-2 border-ink bg-canvas-alt py-6 overflow-hidden select-none mb-24">
-        <div className="w-[90%] mx-auto flex items-center justify-around gap-8 flex-wrap text-sm text-ink font-mono font-bold uppercase tracking-widest text-center">
-          <span className="hover:text-accentBlue transition-colors">React 19</span>
-          <span className="hover:text-accentPurple transition-colors">Supabase DB</span>
-          <span className="hover:text-accentCoral transition-colors">Monaco Compiler</span>
-          <span className="hover:text-accentBlue transition-colors">Node / Express</span>
-          <span className="hover:text-accentPurple transition-colors">Tailwind v4</span>
+      <section className="border-y-2 border-ink bg-canvas-alt py-6 overflow-hidden select-none mb-24 flex whitespace-nowrap group">
+        <div className="flex items-center animate-marquee w-max group-hover:[animation-play-state:paused]">
+          {/* We create 4 duplicate sets to ensure it can span even ultra-wide monitors before looping */}
+          {[...Array(4)].map((_, idx) => (
+            <div key={idx} className="flex items-center gap-16 px-8 text-sm text-ink font-mono font-bold uppercase tracking-widest text-center min-w-max">
+              <span className="hover:text-accentBlue transition-colors cursor-default">React 19</span>
+              <span className="hover:text-accentPurple transition-colors cursor-default">Supabase DB</span>
+              <span className="hover:text-accentCoral transition-colors cursor-default">Monaco Compiler</span>
+              <span className="hover:text-accentBlue transition-colors cursor-default">Node / Express</span>
+              <span className="hover:text-accentPurple transition-colors cursor-default">Tailwind v4</span>
+            </div>
+          ))}
         </div>
       </section>
 

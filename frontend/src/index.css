@@ -186,3 +186,25 @@ tr:last-child td {
 .window-chrome-dot:nth-child(1) { background-color: #ff5f56; }
 .window-chrome-dot:nth-child(2) { background-color: #ffbd2e; }
 .window-chrome-dot:nth-child(3) { background-color: #27c93f; }
+
+@keyframes float-y {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-60px);
+  }
+}
+
+.animate-float-y {
+  animation: float-y 6s ease-in-out infinite;
+}
+
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.animate-marquee {
+  animation: marquee 25s linear infinite;
+}
