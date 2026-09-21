@@ -14,7 +14,7 @@ const Navbar = () => {
   const handleLogout = async () => {
     try {
       await fetch(`${apiUrl}/user/logout`, {
-        method: "POST",
+        method: "GET",
         credentials: "include",
       });
 
@@ -29,18 +29,16 @@ const Navbar = () => {
   };
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-slate-800/80 bg-slate-950/80 backdrop-blur-md">
+    <header className="sticky top-0 z-50 w-full bg-navbg border-b-2 border-ink">
       <div className="w-[90%] mx-auto h-16 flex items-center justify-between">
         
         {/* Left: Brand Logo & Navigation */}
         <div className="flex items-center gap-8">
-          <Link to="/" className="flex items-center gap-2 text-xl font-bold tracking-tight text-white hover:opacity-90">
-            <div className="p-2 rounded-lg bg-indigo-600/10 text-indigo-400 border border-indigo-500/20">
+          <Link to="/" className="flex items-center gap-2 text-xl font-bold font-mono tracking-tight text-ink hover:opacity-80">
+            <div className="p-1 border-2 border-ink bg-surface rounded-md">
               <Code2 className="size-5" />
             </div>
-            <span className="bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
-              Code-It-Up
-            </span>
+            <span>Code-It-Up</span>
           </Link>
 
           {/* Links */}
@@ -49,8 +47,8 @@ const Navbar = () => {
               to="/"
               end
               className={({ isActive }) =>
-                `flex items-center gap-1.5 text-sm font-medium transition-colors ${
-                  isActive ? "text-indigo-400" : "text-gray-400 hover:text-gray-200"
+                `flex items-center gap-1.5 text-sm font-semibold transition-colors font-mono ${
+                  isActive ? "text-ink" : "text-ink-soft hover:text-ink"
                 }`
               }
             >
@@ -61,8 +59,8 @@ const Navbar = () => {
             <NavLink
               to="/problemset"
               className={({ isActive }) =>
-                `flex items-center gap-1.5 text-sm font-medium transition-colors ${
-                  isActive ? "text-indigo-400" : "text-gray-400 hover:text-gray-200"
+                `flex items-center gap-1.5 text-sm font-semibold transition-colors font-mono ${
+                  isActive ? "text-ink" : "text-ink-soft hover:text-ink"
                 }`
               }
             >
@@ -73,8 +71,8 @@ const Navbar = () => {
             <NavLink
               to="/contests"
               className={({ isActive }) =>
-                `flex items-center gap-1.5 text-sm font-medium transition-colors ${
-                  isActive ? "text-indigo-400" : "text-gray-400 hover:text-gray-200"
+                `flex items-center gap-1.5 text-sm font-semibold transition-colors font-mono ${
+                  isActive ? "text-ink" : "text-ink-soft hover:text-ink"
                 }`
               }
             >
@@ -90,9 +88,9 @@ const Navbar = () => {
             <div className="relative">
               <button
                 onClick={() => setOpenMenu(!openMenu)}
-                className="flex items-center gap-2 px-3 py-1.5 rounded-xl border border-slate-800 bg-slate-900/60 text-gray-200 hover:bg-slate-800/80 transition-all font-medium text-sm cursor-target"
+                className="flex items-center gap-2 px-3 py-1.5 rounded-md border-2 border-ink bg-surface text-ink hover:bg-canvas-alt transition-transform font-mono text-sm uppercase tracking-wide cursor-pointer active:translate-y-[1px]"
               >
-                <div className="size-6 rounded-full bg-indigo-600/20 text-indigo-400 border border-indigo-500/30 flex items-center justify-center font-bold text-xs">
+                <div className="size-6 rounded-pill border-2 border-ink bg-lime flex items-center justify-center font-bold text-xs">
                   {userData.username.charAt(0).toUpperCase()}
                 </div>
                 <span>{userData.username}</span>
@@ -102,21 +100,21 @@ const Navbar = () => {
               {openMenu && (
                 <>
                   <div className="fixed inset-0 z-10" onClick={() => setOpenMenu(false)} />
-                  <div className="absolute right-0 mt-2 w-48 rounded-xl border border-slate-800 bg-slate-900 p-1.5 shadow-xl animate-scale-in z-20">
+                  <div className="absolute right-0 mt-2 w-48 rounded-md border-2 border-ink bg-surface p-1.5 z-20">
                     <Link
                       to={`/profile/${userData.username}`}
-                      className="flex items-center gap-2 w-full px-3 py-2 rounded-lg text-sm text-gray-300 hover:bg-slate-800 hover:text-white transition-colors"
+                      className="flex items-center gap-2 w-full px-3 py-2 rounded-md font-mono font-semibold text-sm text-ink hover:bg-canvas-alt transition-colors"
                       onClick={() => setOpenMenu(false)}
                     >
                       <User className="size-4" />
                       My Profile
                     </Link>
 
-                    <div className="h-[1px] bg-slate-800 my-1" />
+                    <div className="h-[1px] bg-divider my-1" />
 
                     <button
                       onClick={handleLogout}
-                      className="flex items-center gap-2 w-full px-3 py-2 rounded-lg text-sm text-rose-400 hover:bg-rose-500/10 transition-colors cursor-target"
+                      className="flex items-center gap-2 w-full px-3 py-2 rounded-md font-mono font-semibold text-sm text-red-700 hover:bg-canvas-alt transition-colors cursor-pointer"
                     >
                       <LogOut className="size-4" />
                       Logout
@@ -126,13 +124,20 @@ const Navbar = () => {
               )}
             </div>
           ) : (
-            <Link
-              to="/login"
-              className="flex items-center gap-1.5 bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-xl text-sm font-semibold transition-all shadow-md hover:shadow-indigo-500/10 cursor-target"
-            >
-              <LogIn className="size-4" />
-              Sign In
-            </Link>
+            <div className="flex items-center gap-3">
+              <Link
+                to="/login"
+                className="flex items-center gap-1.5 bg-surface text-ink border-2 border-ink px-4 py-1.5 rounded-md text-[0.85rem] font-bold font-mono uppercase tracking-[0.03em] hover:-translate-y-0.5 transition-transform active:translate-y-0 cursor-pointer"
+              >
+                Log In
+              </Link>
+              <Link
+                to="/register"
+                className="flex items-center gap-1.5 bg-lime text-ink border-2 border-ink px-4 py-1.5 rounded-md text-[0.85rem] font-bold font-mono uppercase tracking-[0.03em] hover:bg-lime-hover hover:-translate-y-0.5 transition-all active:translate-y-0 cursor-pointer"
+              >
+                Start Testing &rarr;
+              </Link>
+            </div>
           )}
         </div>
       </div>

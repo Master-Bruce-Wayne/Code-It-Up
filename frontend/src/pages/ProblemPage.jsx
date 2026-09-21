@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { useLocation, useParams, Link } from "react-router-dom";
 import { toast } from "react-toastify";
 import { Clock, Cpu, Tag, ArrowRight, BookOpen, AlertCircle, Copy, Check } from "lucide-react";
-import { gsap } from "gsap";
 
 const ProblemPage = () => {
   const location = useLocation();
@@ -25,16 +24,6 @@ const ProblemPage = () => {
           toast.error("Failed to load problem");
         } else {
           setProblem(data.problem);
-          // GSAP fade entrance
-          setTimeout(() => {
-            gsap.from(".fade-block", {
-              y: 15,
-              opacity: 0,
-              duration: 0.5,
-              stagger: 0.1,
-              ease: "power2.out"
-            });
-          }, 50);
         }
       } catch (err) {
         setError("Server error while fetching problem");
@@ -56,21 +45,21 @@ const ProblemPage = () => {
 
   if (loading)
     return (
-      <div className="flex items-center justify-center min-h-screen bg-slate-950">
+      <div className="flex items-center justify-center min-h-screen bg-canvas">
         <div className="text-center">
-          <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-500 mb-4"></div>
-          <h2 className="text-xl font-semibold text-gray-400">Loading Problem...</h2>
+          <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-4 border-ink mb-4"></div>
+          <h2 className="text-xl font-bold font-mono text-ink uppercase tracking-wider">Loading Problem...</h2>
         </div>
       </div>
     );
 
   if (error)
     return (
-      <div className="flex items-center justify-center min-h-screen bg-slate-950 px-4">
-        <div className="max-w-md w-full border border-red-500/20 bg-red-500/5 rounded-2xl p-6 text-center">
-          <AlertCircle className="size-10 text-red-400 mx-auto mb-3" />
-          <h2 className="text-red-400 text-lg font-bold mb-1">Access Denied</h2>
-          <p className="text-gray-400 text-sm font-normal">{error}</p>
+      <div className="flex items-center justify-center min-h-screen bg-canvas px-4">
+        <div className="max-w-md w-full border-2 border-ink bg-surface rounded-lg p-6 text-center shadow-[4px_4px_0_0_#17181A]">
+          <AlertCircle className="size-10 text-accentCoral mx-auto mb-3" />
+          <h2 className="text-ink text-lg font-bold font-mono mb-1">Access Denied</h2>
+          <p className="text-ink-soft text-sm font-normal">{error}</p>
         </div>
       </div>
     );
@@ -78,33 +67,31 @@ const ProblemPage = () => {
   if (!problem) return null;
 
   // Resolve return URL
-  const listUrl = contestCode ? `/contest/${contestCode}` : "/problemset";
   const submitUrl = contestCode ? `/contest/${contestCode}/problem/${probCode}/submit` : `/problemset/problem/${probCode}/submit`;
-  const subMyUrl = contestCode ? `/contest/${contestCode}/submissions/my` : `/problemset/problem/${probCode}/submissions/my`; // Wait, actually the route in main.jsx:
-  // /contest/:contestCode/submissions/my OR /problemset/problem/:probCode/submissions/my
+  const subMyUrl = contestCode ? `/contest/${contestCode}/submissions/my` : `/problemset/problem/${probCode}/submissions/my`;
 
   return (
-    <div className="w-[90%] max-w-7xl mx-auto py-12 bg-slate-950 min-h-screen">
+    <div className="w-[90%] max-w-7xl mx-auto py-12 bg-canvas min-h-screen blueprint-grid">
 
       {/* Navigation Tabs */}
-      <div className="flex gap-6 border-b border-slate-900 mb-8 text-sm font-semibold animate-fade-in">
+      <div className="flex gap-6 border-b-2 border-ink mb-8 text-sm font-bold font-mono uppercase tracking-wide">
         <Link
           to={location.pathname}
-          className="pb-3 text-indigo-400 border-b-2 border-indigo-400 transition-all"
+          className="pb-3 text-ink border-b-4 border-ink transition-all"
         >
           Problem Statement
         </Link>
 
         <Link
           to={submitUrl}
-          className="pb-3 text-gray-500 hover:text-gray-300 transition-all"
+          className="pb-3 text-ink-muted hover:text-ink transition-all"
         >
           Submit Code
         </Link>
 
         <Link
           to={subMyUrl}
-          className="pb-3 text-gray-500 hover:text-gray-300 transition-all"
+          className="pb-3 text-ink-muted hover:text-ink transition-all"
         >
           My Submissions
         </Link>
@@ -116,16 +103,16 @@ const ProblemPage = () => {
         {/* Main Column: Statement & Samples */}
         <div className="lg:col-span-3 space-y-6">
           {/* Header Description */}
-          <div className="border border-slate-900 bg-slate-900/10 backdrop-blur-sm p-6 rounded-2xl space-y-3 fade-block">
-            <h1 className="text-3xl font-extrabold text-white tracking-tight">{problem.probName}</h1>
+          <div className="border-2 border-ink bg-surface p-6 rounded-lg space-y-3">
+            <h1 className="text-3xl font-bold font-mono text-ink tracking-tight">{problem.probName}</h1>
             
             {problem.probTags?.length > 0 && (
               <div className="flex gap-2 flex-wrap items-center">
-                <Tag className="size-3.5 text-gray-500 flex-shrink-0" />
+                <Tag className="size-3.5 text-ink-muted flex-shrink-0" />
                 {problem.probTags.map((tag, i) => (
                   <span
                     key={i}
-                    className="px-2 py-0.5 text-xs bg-slate-950 border border-slate-800 text-gray-400 rounded-md font-medium"
+                    className="px-2 py-0.5 text-[0.7rem] bg-canvas-alt border border-divider text-ink-soft rounded-md font-mono font-bold uppercase tracking-wide"
                   >
                     {tag}
                   </span>
@@ -135,69 +122,73 @@ const ProblemPage = () => {
           </div>
 
           {/* Statement */}
-          <section className="border border-slate-900 bg-slate-900/20 p-6 rounded-2xl fade-block">
-            <h2 className="text-xl font-bold text-white mb-3">Problem Description</h2>
-            <div className="text-gray-300 whitespace-pre-line leading-relaxed font-normal text-sm md:text-base">
+          <section className="border-2 border-ink bg-surface p-6 rounded-lg">
+            <h2 className="text-xl font-bold font-mono text-ink mb-3">Problem Description</h2>
+            <div className="text-ink-soft font-mono whitespace-pre-line leading-relaxed font-normal text-sm md:text-base">
               {problem.probStatement}
             </div>
           </section>
 
           {/* Input Format */}
-          <section className="border border-slate-900 bg-slate-900/20 p-6 rounded-2xl fade-block">
-            <h2 className="text-lg font-bold text-white mb-2">Input Format</h2>
-            <p className="text-gray-400 whitespace-pre-line text-sm leading-relaxed">
+          <section className="border-2 border-ink bg-surface p-6 rounded-lg">
+            <h2 className="text-lg font-bold font-mono text-ink mb-2">Input Format</h2>
+            <p className="text-ink-soft font-mono whitespace-pre-line text-sm leading-relaxed">
               {problem.inputFormat}
             </p>
           </section>
 
           {/* Output Format */}
-          <section className="border border-slate-900 bg-slate-900/20 p-6 rounded-2xl fade-block">
-            <h2 className="text-lg font-bold text-white mb-2">Output Format</h2>
-            <p className="text-gray-400 whitespace-pre-line text-sm leading-relaxed">
+          <section className="border-2 border-ink bg-surface p-6 rounded-lg">
+            <h2 className="text-lg font-bold font-mono text-ink mb-2">Output Format</h2>
+            <p className="text-ink-soft font-mono whitespace-pre-line text-sm leading-relaxed">
               {problem.outputFormat}
             </p>
           </section>
 
           {/* Sample Tests */}
-          <section className="space-y-4 fade-block">
-            <h2 className="text-xl font-extrabold text-white tracking-tight">Sample Tests</h2>
+          <section className="space-y-4">
+            <h2 className="text-xl font-bold font-mono text-ink tracking-tight">Sample Tests</h2>
 
             {problem.samples?.length === 0 ? (
-              <p className="text-gray-500 text-sm">No sample tests available.</p>
+              <p className="text-ink-muted text-sm font-mono font-bold uppercase tracking-wider">No sample tests available.</p>
             ) : (
-              <div className="flex flex-col gap-4">
+              <div className="flex flex-col gap-6">
                 {problem.samples?.map((s, i) => (
                   <div
                     key={i}
-                    className="border border-slate-900 bg-slate-900/10 rounded-2xl p-5 space-y-4"
+                    className="window-chrome"
                   >
-                    <p className="text-sm font-bold text-gray-300 flex items-center gap-1.5">
-                      <span className="size-2 rounded-full bg-indigo-500" />
-                      Sample Case #{i + 1}
-                    </p>
+                    <div className="window-chrome-header flex justify-between">
+                      <div className="flex items-center gap-2">
+                        <div className="window-chrome-dots">
+                          <div className="window-chrome-dot" />
+                          <div className="window-chrome-dot" />
+                          <div className="window-chrome-dot" />
+                        </div>
+                        <span className="text-[11px] font-mono text-ink-muted font-bold uppercase tracking-wider ml-2">Sample #{i + 1}</span>
+                      </div>
+                      <button
+                        onClick={() => copyToClipboard(s.input, i)}
+                        className="p-1.5 rounded-md border-2 border-ink bg-surface hover:bg-canvas-alt text-ink transition-all cursor-pointer"
+                        title="Copy input"
+                      >
+                        {copiedIndex === i ? <Check className="size-3.5 text-accentBlue" /> : <Copy className="size-3.5" />}
+                      </button>
+                    </div>
 
-                    <div className="grid md:grid-cols-2 gap-4">
+                    <div className="p-5 bg-surface grid md:grid-cols-2 gap-4">
                       {/* Input container */}
                       <div className="space-y-1.5">
-                        <div className="flex justify-between items-center">
-                          <span className="text-xs font-bold text-gray-500 uppercase tracking-wider">Input</span>
-                          <button
-                            onClick={() => copyToClipboard(s.input, i)}
-                            className="p-1.5 rounded-lg border border-slate-800 bg-slate-900/40 hover:bg-slate-800 text-gray-500 hover:text-gray-300 transition-all cursor-target"
-                            title="Copy input"
-                          >
-                            {copiedIndex === i ? <Check className="size-3.5 text-emerald-400" /> : <Copy className="size-3.5" />}
-                          </button>
-                        </div>
-                        <pre className="bg-slate-950 border border-slate-900 text-rose-400/90 p-4 rounded-xl font-mono text-sm overflow-x-auto select-all">
+                        <span className="text-[10px] font-mono font-bold text-ink-muted uppercase tracking-wider block">Input</span>
+                        <pre className="bg-canvas border border-ink text-ink-soft p-4 rounded-md font-mono text-sm overflow-x-auto select-all h-full">
                           {s.input}
                         </pre>
                       </div>
 
                       {/* Output container */}
                       <div className="space-y-1.5">
-                        <span className="text-xs font-bold text-gray-500 uppercase tracking-wider">Expected Output</span>
-                        <pre className="bg-slate-950 border border-slate-900 text-emerald-400/90 p-4 rounded-xl font-mono text-sm overflow-x-auto">
+                        <span className="text-[10px] font-mono font-bold text-ink-muted uppercase tracking-wider block">Expected Output</span>
+                        <pre className="bg-canvas border border-ink text-ink-soft p-4 rounded-md font-mono text-sm overflow-x-auto h-full">
                           {s.output}
                         </pre>
                       </div>
@@ -212,14 +203,14 @@ const ProblemPage = () => {
         {/* Sidebar Info Column */}
         <div className="space-y-6">
           {/* Action Card */}
-          <div className="border border-slate-900 bg-slate-900/30 backdrop-blur-sm p-6 rounded-2xl space-y-4 fade-block">
-            <h3 className="text-lg font-bold text-white tracking-tight">Solve Challenge</h3>
-            <p className="text-gray-400 text-xs font-normal">
+          <div className="border-2 border-ink bg-surface p-6 rounded-lg space-y-4">
+            <h3 className="text-lg font-bold text-ink tracking-tight">Solve Challenge</h3>
+            <p className="text-ink-soft text-xs font-normal">
               Read the details carefully, verify constraints, and write your solution in our editor.
             </p>
             <Link
               to={submitUrl}
-              className="flex items-center justify-center gap-1.5 w-full bg-indigo-600 hover:bg-indigo-500 text-white py-3 rounded-xl font-bold text-sm shadow-lg shadow-indigo-600/10 cursor-target hover:-translate-y-0.5 transition-all"
+              className="flex items-center justify-center gap-1.5 w-full bg-lime border-2 border-ink text-ink py-3 rounded-md font-mono font-bold text-[0.85rem] uppercase tracking-wide shadow-[4px_4px_0_0_#17181A] hover:bg-lime-hover hover:-translate-y-0.5 active:translate-y-0 transition-transform cursor-pointer"
             >
               Code Solution
               <ArrowRight className="size-4" />
@@ -227,39 +218,39 @@ const ProblemPage = () => {
           </div>
 
           {/* Limits Card */}
-          <div className="border border-slate-900 bg-slate-900/30 backdrop-blur-sm p-6 rounded-2xl space-y-4 fade-block">
-            <h3 className="text-sm font-bold text-gray-500 uppercase tracking-wider">Constraints & Limits</h3>
-            <div className="flex flex-col gap-3.5 text-sm text-gray-300 font-normal">
+          <div className="border-2 border-ink bg-surface p-6 rounded-lg space-y-4">
+            <h3 className="text-xs font-bold text-ink font-mono uppercase tracking-wider">Constraints & Limits</h3>
+            <div className="flex flex-col gap-3.5 text-sm text-ink font-normal">
               <div className="flex items-center gap-2.5">
-                <Clock className="size-4 text-indigo-400" />
+                <Clock className="size-4 text-ink-soft" />
                 <div>
-                  <span className="block text-gray-500 text-[10px] font-bold uppercase tracking-wider">Time Limit</span>
-                  <span className="text-gray-200 font-semibold">{problem.timeLimit} ms</span>
+                  <span className="block text-ink-muted text-[10px] font-bold font-mono uppercase tracking-wider">Time Limit</span>
+                  <span className="text-ink font-semibold">{problem.timeLimit} ms</span>
                 </div>
               </div>
 
               <div className="flex items-center gap-2.5">
-                <Cpu className="size-4 text-purple-400" />
+                <Cpu className="size-4 text-ink-soft" />
                 <div>
-                  <span className="block text-gray-500 text-[10px] font-bold uppercase tracking-wider">Memory Limit</span>
-                  <span className="text-gray-200 font-semibold">{problem.memoryLimit} MB</span>
+                  <span className="block text-ink-muted text-[10px] font-bold font-mono uppercase tracking-wider">Memory Limit</span>
+                  <span className="text-ink font-semibold">{problem.memoryLimit} MB</span>
                 </div>
               </div>
 
               <div className="flex items-center gap-2.5">
-                <AlertCircle className="size-4 text-amber-400" />
+                <AlertCircle className="size-4 text-ink-soft" />
                 <div>
-                  <span className="block text-gray-500 text-[10px] font-bold uppercase tracking-wider">Problem Difficulty</span>
-                  <span className="text-gray-200 font-semibold">{problem.probRating}</span>
+                  <span className="block text-ink-muted text-[10px] font-bold font-mono uppercase tracking-wider">Problem Difficulty</span>
+                  <span className="text-ink font-semibold">{problem.probRating || "Unrated"}</span>
                 </div>
               </div>
             </div>
           </div>
 
           {/* Constraints Statement */}
-          <div className="border border-slate-900 bg-slate-900/30 backdrop-blur-sm p-6 rounded-2xl space-y-2 fade-block">
-            <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider">Additional Constraints</h3>
-            <p className="text-gray-400 whitespace-pre-line text-xs leading-relaxed font-normal">
+          <div className="border-2 border-ink bg-surface p-6 rounded-lg space-y-2">
+            <h3 className="text-xs font-bold text-ink font-mono uppercase tracking-wider">Additional Constraints</h3>
+            <p className="text-ink-soft font-mono whitespace-pre-line text-xs leading-relaxed font-normal">
               {problem.constraints}
             </p>
           </div>

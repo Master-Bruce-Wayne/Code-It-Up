@@ -1,88 +1,34 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { useNavigate, useParams, Link } from 'react-router-dom';
+import { useNavigate, useParams, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/User.jsx';
 import Editor from "@monaco-editor/react";
 import { toast } from 'react-toastify';
-import { Code2, Terminal, Send, Play, RefreshCw, ArrowLeft, FileText, CheckCircle2, XCircle, Clock, AlertTriangle } from 'lucide-react';
+import { Play, Send, RefreshCw } from 'lucide-react';
 
 const CodeEditorPage = () => {
     const apiUrl = import.meta.env.VITE_API_BASE_URL;
     const { userData } = useAuth();
     const { probCode, contestCode } = useParams();
+    const location = useLocation();
     const navigate = useNavigate();
 
     // Editor & Language states
     const [language, setLanguage] = useState('cpp');
-    const [code, setCode] = useState(`#include<bits/stdc++.h>
-using namespace std;
-
-int main(){
-    // Write your code here
-    cout << "Hello, World!" << endl;
-    return 0;
-}`);
+    const [code, setCode] = useState(`#include<bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    // Write your code here\n    cout << "Hello, World!" << endl;\n    return 0;\n}`);
     const [loading, setLoading] = useState(false);
     const [running, setRunning] = useState(false);
-    const [leftTab, setLeftTab] = useState('description'); // 'description' | 'submissions'
-    
-    // Problem and Submissions details
-    const [problem, setProblem] = useState(null);
-    const [problemLoading, setProblemLoading] = useState(true);
-    const [submissions, setSubmissions] = useState([]);
     
     // Custom execution console states
     const [customInput, setCustomInput] = useState('');
     const [consoleOutput, setConsoleOutput] = useState('');
     const [consoleVerdict, setConsoleVerdict] = useState('');
-    const [consoleOpen, setConsoleOpen] = useState(false);
-    const [consoleTab, setConsoleTab] = useState('input'); // 'input' | 'output'
-
-    // Fetch problem details and previous submissions
-    useEffect(() => {
-        const fetchProblem = async () => {
-            try {
-                const res = await fetch(`${apiUrl}/problem/getProb/${probCode}`);
-                const data = await res.json();
-                if (data.success) {
-                    setProblem(data.problem);
-                } else {
-                    toast.error("Failed to load problem statement");
-                }
-            } catch (err) {
-                console.error("Error fetching problem:", err);
-            } finally {
-                setProblemLoading(false);
-            }
-        };
-
-        fetchProblem();
-    }, [probCode]);
-
-    const fetchSubmissions = async () => {
-        if (!userData) return;
-        try {
-            const res = await fetch(`${apiUrl}/submission/problem/${probCode}/user/${userData.username}`);
-            const data = await res.json();
-            if (data.success) {
-                setSubmissions(data.submissions || []);
-            }
-        } catch (err) {
-            console.error("Error fetching user submissions:", err);
-        }
-    };
-
-    useEffect(() => {
-        if (leftTab === 'submissions') {
-            fetchSubmissions();
-        }
-    }, [leftTab, userData]);
+    const [hasRun, setHasRun] = useState(false);
 
     const handleRunCode = async () => {
         try {
             setRunning(true);
-            setConsoleOpen(true);
-            setConsoleTab('output');
+            setHasRun(true);
             setConsoleVerdict('Running...');
             setConsoleOutput('');
 
@@ -133,8 +79,7 @@ int main(){
                     toast.warn(`Submission evaluated: ${res.data.verdict}`);
                 }
                 // Switch to submissions tab to view history
-                setLeftTab('submissions');
-                fetchSubmissions();
+                navigate(subMyUrl);
             }
         } catch (err) {
             toast.error(err.message);
@@ -144,310 +89,163 @@ int main(){
     };
 
     const handleReset = () => {
-        setCode(`#include<bits/stdc++.h>
-using namespace std;
-
-int main(){
-    // Write your code here
-    cout << "Hello, World!" << endl;
-    return 0;
-}`);
+        setCode(`#include<bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    // Write your code here\n    cout << "Hello, World!" << endl;\n    return 0;\n}`);
         toast.info("Editor reset");
     };
 
     const getVerdictColor = (v) => {
-        if (v === 'AC') return 'text-emerald-400';
-        if (v === 'WA') return 'text-rose-400';
-        if (v === 'TLE') return 'text-amber-500';
-        if (v === 'CE') return 'text-yellow-500';
-        return 'text-red-400';
+        if (v === 'AC') return 'text-lime';
+        if (v === 'WA') return 'text-accentCoral';
+        if (v === 'TLE') return 'text-accentPurple';
+        if (v === 'CE') return 'text-accentCoral';
+        return 'text-accentCoral';
     };
 
-    const getVerdictBg = (v) => {
-        if (v === 'AC') return 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400';
-        if (v === 'WA') return 'bg-rose-500/10 border-rose-500/20 text-rose-400';
-        if (v === 'TLE') return 'bg-amber-500/10 border-amber-500/20 text-amber-400';
-        return 'bg-slate-800 border-slate-700 text-slate-400';
-    };
-
-    const backUrl = contestCode ? `/contest/${contestCode}` : `/problemset/problem/${probCode}`;
+    const probUrl = contestCode ? `/contest/${contestCode}/problem/${probCode}` : `/problemset/problem/${probCode}`;
+    const submitUrl = location.pathname;
+    const subMyUrl = contestCode ? `/contest/${contestCode}/submissions/my` : `/problemset/problem/${probCode}/submissions/my`;
 
     return (
-        <div className="min-h-screen bg-slate-950 flex flex-col h-screen text-gray-200">
-            {/* Header / Topbar */}
-            <div className="h-14 border-b border-slate-900 bg-slate-950 px-6 flex items-center justify-between shrink-0">
-                <div className="flex items-center gap-3">
-                    <Link to={backUrl} className="p-1.5 rounded-lg hover:bg-slate-900 text-gray-400 hover:text-white transition-all">
-                        <ArrowLeft className="size-4" />
-                    </Link>
-                    <span className="h-4 w-[1px] bg-slate-800" />
-                    <h1 className="font-extrabold text-sm text-white tracking-tight">
-                        Coding Workspace • <span className="text-indigo-400">{probCode}</span>
-                    </h1>
+        <div className="w-[90%] max-w-7xl mx-auto py-12 bg-canvas min-h-screen blueprint-grid">
+            {/* Navigation Tabs */}
+            <div className="flex gap-6 border-b-2 border-ink mb-8 text-sm font-bold font-mono uppercase tracking-wide">
+                <Link
+                  to={probUrl}
+                  className="pb-3 text-ink-muted hover:text-ink transition-all"
+                >
+                  Problem Statement
+                </Link>
+
+                <Link
+                  to={submitUrl}
+                  className="pb-3 text-ink border-b-4 border-ink transition-all"
+                >
+                  Submit Code
+                </Link>
+
+                <Link
+                  to={subMyUrl}
+                  className="pb-3 text-ink-muted hover:text-ink transition-all"
+                >
+                  My Submissions
+                </Link>
+            </div>
+
+            <div className="space-y-6 max-w-4xl">
+                {/* Header & Controls */}
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <h1 className="text-2xl font-bold font-mono text-ink tracking-tight">Submit Code for <span className="text-accentBlue">{probCode}</span></h1>
+                    
+                    <div className="flex items-center gap-3">
+                        <select
+                            value={language}
+                            onChange={(e) => setLanguage(e.target.value)}
+                            className="bg-surface border-2 border-ink text-ink px-4 py-2 rounded-md font-mono font-bold text-[0.85rem] focus:outline-none focus:shadow-[4px_4px_0_0_#17181A] transition-shadow uppercase tracking-wide"
+                        >
+                            <option value="cpp">C++ (g++)</option>
+                            <option value="java" disabled>Java (Soon)</option>
+                            <option value="python" disabled>Python (Soon)</option>
+                        </select>
+
+                        <button
+                            onClick={handleReset}
+                            className="p-2 rounded-md border-2 border-ink bg-surface hover:bg-canvas-alt text-ink transition-all cursor-pointer"
+                            title="Reset code"
+                        >
+                            <RefreshCw className="size-5" />
+                        </button>
+                    </div>
                 </div>
 
-                <div className="flex items-center gap-3">
-                    <select
-                        value={language}
-                        onChange={(e) => setLanguage(e.target.value)}
-                        className="bg-slate-900 border border-slate-800 text-gray-200 px-3.5 py-1.5 rounded-lg text-xs font-semibold focus:outline-none"
+                {/* Editor Container */}
+                <div className="border-2 border-ink rounded-lg overflow-hidden h-[500px] shadow-[8px_8px_0_0_#17181A]">
+                    <div className="bg-canvas-alt border-b-2 border-ink p-2 flex items-center gap-2">
+                        <div className="flex gap-1.5 px-2">
+                            <div className="size-3 rounded-full border border-ink bg-surface" />
+                            <div className="size-3 rounded-full border border-ink bg-surface" />
+                            <div className="size-3 rounded-full border border-ink bg-surface" />
+                        </div>
+                        <span className="text-ink-muted text-xs font-mono font-bold uppercase tracking-wider ml-2">editor.cpp</span>
+                    </div>
+                    <Editor
+                        height="calc(100% - 42px)"
+                        language={language}
+                        theme="vs-light"
+                        value={code}
+                        onChange={(value) => setCode(value ?? "")}
+                        options={{
+                            fontSize: 14,
+                            minimap: { enabled: false },
+                            scrollBeyondLastLine: false,
+                            automaticLayout: true,
+                            wordWrap: 'on',
+                            lineNumbers: 'on',
+                            tabSize: 4,
+                            fontFamily: 'JetBrains Mono, Courier New, monospace',
+                            cursorStyle: 'line',
+                            insertSpaces: true,
+                        }}
+                    />
+                </div>
+
+                {/* Custom Input / Output Area */}
+                <div className="grid md:grid-cols-2 gap-6">
+                    <div className="space-y-2">
+                        <label className="block text-ink font-mono font-bold uppercase tracking-wider text-[11px]">Custom Input (stdin)</label>
+                        <textarea
+                            value={customInput}
+                            onChange={(e) => setCustomInput(e.target.value)}
+                            placeholder="Provide standard input..."
+                            className="w-full h-32 bg-surface border-2 border-ink rounded-md p-3 text-ink-soft font-mono text-sm focus:outline-none focus:shadow-[4px_4px_0_0_#17181A] transition-shadow resize-none"
+                        />
+                    </div>
+                    <div className="space-y-2">
+                        <label className="block text-ink font-mono font-bold uppercase tracking-wider text-[11px]">Execution Output</label>
+                        <div className="w-full h-32 bg-canvas-alt border-2 border-ink rounded-md p-3 overflow-y-auto">
+                            {!hasRun ? (
+                                <span className="text-ink-muted font-mono text-sm">Run your code to see output...</span>
+                            ) : (
+                                <div className="space-y-2">
+                                    <div className="flex items-center gap-2">
+                                        <span className="text-ink-muted font-bold font-mono text-xs uppercase tracking-wider">Verdict:</span>
+                                        <span className={`font-bold uppercase font-mono text-sm ${getVerdictColor(consoleVerdict)}`}>
+                                            {consoleVerdict}
+                                        </span>
+                                    </div>
+                                    <div>
+                                        <pre className="text-ink-soft whitespace-pre-wrap font-mono text-sm">
+                                            {consoleOutput || "(No stdout/Empty output)"}
+                                        </pre>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="flex justify-end gap-4 pt-4 border-t-2 border-ink">
+                    <button
+                        onClick={handleRunCode}
+                        disabled={running || loading}
+                        className="flex items-center gap-1.5 bg-surface hover:bg-canvas-alt text-ink px-6 py-2.5 rounded-md font-mono font-bold text-sm uppercase tracking-wide border-2 border-ink disabled:opacity-50 transition-transform active:translate-y-[1px] cursor-pointer"
                     >
-                        <option value="cpp">C++ (g++)</option>
-                        <option value="java" disabled>Java (Soon)</option>
-                        <option value="python" disabled>Python (Soon)</option>
-                    </select>
+                        <Play className="size-4" />
+                        {running ? "Running..." : "Run Code"}
+                    </button>
 
                     <button
-                        onClick={handleReset}
-                        className="p-1.5 rounded-lg border border-slate-800 bg-slate-900/60 hover:bg-slate-800 text-gray-400 hover:text-white transition-all cursor-target"
-                        title="Reset code"
+                        onClick={handleSubmit}
+                        disabled={loading || running}
+                        className="flex items-center gap-1.5 bg-lime hover:bg-lime-hover text-ink px-8 py-2.5 rounded-md font-mono font-bold text-sm uppercase tracking-wide border-2 border-ink shadow-[4px_4px_0_0_#17181A] hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-50 transition-all cursor-pointer"
                     >
-                        <RefreshCw className="size-4" />
+                        <Send className="size-4" />
+                        {loading ? "Submitting..." : "Submit"}
                     </button>
                 </div>
             </div>
-
-            {/* Split Panel */}
-            <div className="flex flex-1 overflow-hidden shrink min-h-0">
-                
-                {/* Left Side: Statement/Submissions */}
-                <div className="w-[45%] border-r border-slate-900 flex flex-col h-full bg-slate-950">
-                    <div className="h-11 border-b border-slate-900 bg-slate-950/40 flex items-center px-4 gap-4 shrink-0">
-                        <button
-                          onClick={() => setLeftTab('description')}
-                          className={`h-full px-2 text-xs font-bold tracking-wide uppercase transition-all flex items-center gap-1.5 border-b-2 ${
-                            leftTab === 'description' ? 'text-indigo-400 border-indigo-400' : 'text-gray-500 border-transparent hover:text-gray-300'
-                          }`}
-                        >
-                            <FileText className="size-3.5" />
-                            Description
-                        </button>
-                        <button
-                          onClick={() => setLeftTab('submissions')}
-                          className={`h-full px-2 text-xs font-bold tracking-wide uppercase transition-all flex items-center gap-1.5 border-b-2 ${
-                            leftTab === 'submissions' ? 'text-indigo-400 border-indigo-400' : 'text-gray-500 border-transparent hover:text-gray-300'
-                          }`}
-                        >
-                            <Terminal className="size-3.5" />
-                            Submissions
-                        </button>
-                    </div>
-
-                    {/* Left Pane Content scrollable */}
-                    <div className="flex-1 overflow-y-auto p-6 space-y-6">
-                        {problemLoading ? (
-                            <div className="text-center py-10 text-gray-500 font-medium">Loading description...</div>
-                        ) : leftTab === 'description' && problem ? (
-                            <div className="space-y-6">
-                                <div>
-                                    <h2 className="text-2xl font-extrabold text-white tracking-tight mb-2">{problem.probName}</h2>
-                                    <div className="flex items-center gap-3 text-xs text-gray-500">
-                                      <span className="font-semibold text-gray-400">Limits:</span>
-                                      <span>Time: {problem.timeLimit}ms</span>
-                                      <span>Memory: {problem.memoryLimit}MB</span>
-                                      <span>Rating: {problem.probRating}</span>
-                                    </div>
-                                </div>
-
-                                <div className="h-[1px] bg-slate-900" />
-
-                                <div className="space-y-4">
-                                    <div className="text-gray-300 whitespace-pre-line leading-relaxed text-sm md:text-base font-normal">
-                                        {problem.probStatement}
-                                    </div>
-                                </div>
-
-                                <div className="space-y-2.5">
-                                    <h4 className="text-xs font-bold text-gray-400 uppercase tracking-wider">Input Format</h4>
-                                    <p className="text-gray-400 text-sm leading-relaxed whitespace-pre-line">
-                                        {problem.inputFormat}
-                                    </p>
-                                </div>
-
-                                <div className="space-y-2.5">
-                                    <h4 className="text-xs font-bold text-gray-400 uppercase tracking-wider">Output Format</h4>
-                                    <p className="text-gray-400 text-sm leading-relaxed whitespace-pre-line">
-                                        {problem.outputFormat}
-                                    </p>
-                                </div>
-
-                                <div className="space-y-2.5">
-                                    <h4 className="text-xs font-bold text-gray-400 uppercase tracking-wider">Constraints</h4>
-                                    <p className="text-gray-400 text-xs leading-relaxed whitespace-pre-line">
-                                        {problem.constraints}
-                                    </p>
-                                </div>
-
-                                <div className="space-y-4 pt-2">
-                                    <h3 className="text-sm font-bold text-gray-300 uppercase tracking-wider">Sample Cases</h3>
-                                    {problem.samples?.map((s, idx) => (
-                                        <div key={idx} className="border border-slate-900 bg-slate-900/10 rounded-xl p-4 space-y-3">
-                                            <p className="text-xs font-bold text-gray-400">Case #{idx + 1}</p>
-                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
-                                                <div>
-                                                    <span className="block text-gray-500 font-bold uppercase tracking-wider mb-1">Input</span>
-                                                    <pre className="bg-slate-950 border border-slate-900 text-rose-400 p-3 rounded-lg overflow-x-auto select-all font-mono">
-                                                        {s.input}
-                                                    </pre>
-                                                </div>
-                                                <div>
-                                                    <span className="block text-gray-500 font-bold uppercase tracking-wider mb-1">Expected Output</span>
-                                                    <pre className="bg-slate-950 border border-slate-900 text-emerald-400 p-3 rounded-lg overflow-x-auto font-mono">
-                                                        {s.output}
-                                                    </pre>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-                        ) : leftTab === 'submissions' ? (
-                            <div className="space-y-4">
-                                <h3 className="text-lg font-bold text-white tracking-tight">Your Previous Submissions</h3>
-                                {submissions.length === 0 ? (
-                                    <p className="text-gray-500 text-sm">No submissions recorded for this problem.</p>
-                                ) : (
-                                    <div className="flex flex-col gap-3">
-                                        {submissions.map((s, idx) => (
-                                            <div key={s._id} className="border border-slate-900 bg-slate-900/10 p-4 rounded-xl flex items-center justify-between text-sm">
-                                                <div className="space-y-1">
-                                                    <div className="flex items-center gap-2">
-                                                        <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold border ${getVerdictBg(s.verdict)}`}>
-                                                            {s.verdict}
-                                                        </span>
-                                                        <span className="text-xs text-gray-500 font-mono">{s.language}</span>
-                                                    </div>
-                                                    <span className="block text-[11px] text-gray-500">{new Date(s.createdAt).toLocaleString()}</span>
-                                                </div>
-                                            </div>
-                                        ))}
-                                    </div>
-                                )}
-                            </div>
-                        ) : null}
-                    </div>
-                </div>
-
-                {/* Right Side: Monaco & Console */}
-                <div className="flex-1 flex flex-col h-full bg-slate-950 relative min-w-0">
-                    
-                    {/* Monaco Editor Container */}
-                    <div className="flex-1 min-h-0 bg-slate-950">
-                        <Editor
-                            height="100%"
-                            language={language}
-                            theme="vs-dark"
-                            value={code}
-                            onChange={(value) => setCode(value ?? "")}
-                            options={{
-                                fontSize: 15,
-                                minimap: { enabled: false },
-                                scrollBeyondLastLine: false,
-                                automaticLayout: true,
-                                wordWrap: 'on',
-                                lineNumbers: 'on',
-                                tabSize: 4,
-                                fontFamily: 'JetBrains Mono, Courier New, monospace',
-                                cursorStyle: 'line',
-                                insertSpaces: true,
-                            }}
-                        />
-                    </div>
-
-                    {/* Bottom Console Panel Drawer */}
-                    {consoleOpen && (
-                        <div className="h-56 border-t border-slate-900 bg-slate-950 flex flex-col shrink-0 select-none">
-                            <div className="h-10 border-b border-slate-900 bg-slate-950/40 flex items-center justify-between px-4">
-                                <div className="flex gap-4 h-full">
-                                    <button
-                                      onClick={() => setConsoleTab('input')}
-                                      className={`h-full text-xs font-bold uppercase tracking-wide border-b-2 flex items-center ${
-                                        consoleTab === 'input' ? 'text-indigo-400 border-indigo-400' : 'text-gray-500 border-transparent hover:text-gray-300'
-                                      }`}
-                                    >
-                                        Custom Input
-                                    </button>
-                                    <button
-                                      onClick={() => setConsoleTab('output')}
-                                      className={`h-full text-xs font-bold uppercase tracking-wide border-b-2 flex items-center ${
-                                        consoleTab === 'output' ? 'text-indigo-400 border-indigo-400' : 'text-gray-500 border-transparent hover:text-gray-300'
-                                      }`}
-                                    >
-                                        Run Result
-                                    </button>
-                                </div>
-                                <button 
-                                  onClick={() => setConsoleOpen(false)}
-                                  className="text-gray-500 hover:text-gray-300 text-xs font-bold hover:underline cursor-target"
-                                >
-                                  Close
-                                </button>
-                            </div>
-
-                            <div className="flex-1 overflow-y-auto p-4 bg-slate-950 font-mono text-sm">
-                                {consoleTab === 'input' ? (
-                                    <textarea
-                                      value={customInput}
-                                      onChange={(e) => setCustomInput(e.target.value)}
-                                      placeholder="Provide standard input (stdin) for code execution..."
-                                      className="w-full h-full bg-slate-950 text-gray-200 border-0 outline-none resize-none placeholder-gray-600 focus:ring-0"
-                                    />
-                                ) : (
-                                    <div className="space-y-3">
-                                        <div className="flex items-center gap-2">
-                                            <span className="text-gray-500 font-bold">VERDICT:</span>
-                                            <span className={`font-extrabold uppercase ${getVerdictColor(consoleVerdict)}`}>
-                                                {consoleVerdict}
-                                            </span>
-                                        </div>
-                                        <div>
-                                            <span className="block text-gray-500 font-bold mb-1">STDOUT:</span>
-                                            <pre className="text-gray-300 whitespace-pre-wrap leading-relaxed">
-                                                {consoleOutput || "(No stdout/Empty output)"}
-                                            </pre>
-                                        </div>
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-                    )}
-
-                    {/* Bottom Toolbar Action buttons */}
-                    <div className="h-14 border-t border-slate-900 bg-slate-950/60 flex items-center justify-between px-6 shrink-0 select-none">
-                        <button
-                          onClick={() => setConsoleOpen(!consoleOpen)}
-                          className="flex items-center gap-1 text-gray-400 hover:text-white px-3 py-1.5 rounded-xl border border-slate-800 bg-slate-900/20 hover:bg-slate-900/60 transition-all font-bold text-xs cursor-target"
-                        >
-                            <Terminal className="size-3.5" />
-                            Console
-                        </button>
-
-                        <div className="flex gap-3">
-                            <button
-                                onClick={handleRunCode}
-                                disabled={running || loading}
-                                className="flex items-center gap-1.5 bg-slate-900 hover:bg-slate-800 text-gray-200 px-5 py-2.5 rounded-xl font-bold text-sm shadow-md transition-all hover:-translate-y-0.5 active:translate-y-0 border border-slate-800 disabled:opacity-50 cursor-target"
-                            >
-                                <Play className="size-3.5 fill-gray-200" />
-                                {running ? "Running..." : "Run"}
-                            </button>
-
-                            <button
-                                onClick={handleSubmit}
-                                disabled={loading || running}
-                                className="flex items-center gap-1.5 bg-indigo-600 hover:bg-indigo-500 text-white px-6 py-2.5 rounded-xl font-bold text-sm shadow-lg shadow-indigo-600/10 transition-all hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-50 cursor-target"
-                            >
-                                <Send className="size-3.5" />
-                                {loading ? "Submitting..." : "Submit"}
-                            </button>
-                        </div>
-                    </div>
-
-                </div>
-
-            </div>
         </div>
     );
-}
+};
 
 export default CodeEditorPage;

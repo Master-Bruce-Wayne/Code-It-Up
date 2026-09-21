@@ -4,6 +4,7 @@ import axios from "axios";
 import { useNavigate, Link } from "react-router-dom";
 import { toast } from "react-toastify";
 import { User, Lock, Mail, Eye, EyeOff, UserPlus, ArrowRight } from "lucide-react";
+import AnnotationMarker from "../components/AnnotationMarker.jsx";
 
 const Register = () => {
   const navigate = useNavigate();
@@ -42,106 +43,103 @@ const Register = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-950 px-4 relative overflow-hidden">
-      {/* Background Glows */}
-      <div className="absolute top-1/4 left-1/4 size-96 bg-indigo-500/5 rounded-full blur-3xl" />
-      <div className="absolute bottom-1/4 right-1/4 size-96 bg-purple-500/5 rounded-full blur-3xl" />
+    <div className="min-h-screen flex items-center justify-center bg-canvas blueprint-grid px-4 relative py-12">
+      <div className="w-full max-w-md bg-surface border-2 border-ink p-8 shadow-[4px_4px_0_0_#17181A] relative my-auto">
+        <AnnotationMarker top left />
+        <AnnotationMarker top right />
+        <AnnotationMarker bottom left />
+        <AnnotationMarker bottom right />
 
-      <div className="w-full max-w-md bg-slate-900/60 border border-slate-800 backdrop-blur-md rounded-2xl p-8 shadow-2xl animate-scale-in">
-        <div className="text-center mb-8">
-          <div className="size-12 bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 rounded-xl flex items-center justify-center mx-auto mb-4">
-            <UserPlus className="size-6" />
+        <div className="text-center mb-8 relative z-10">
+          <div className="size-12 bg-canvas border-2 border-ink flex items-center justify-center mx-auto mb-4 shadow-[2px_2px_0_0_#17181A]">
+            <UserPlus className="size-6 text-ink" />
           </div>
-          <h2 className="text-3xl font-extrabold text-white mb-2 tracking-tight">
+          <h2 className="text-3xl font-bold font-mono text-ink mb-2 tracking-tight uppercase">
             Create Account
           </h2>
-          <p className="text-gray-400 text-sm font-normal">
-            Join the platform and start coding!
+          <p className="text-ink/60 text-sm font-mono uppercase">
+            Join the platform
           </p>
         </div>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
-          {/* Username */}
+        <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4 relative z-10">
           <div className="flex flex-col gap-1.5">
-            <label className="text-sm font-semibold text-gray-300">Username</label>
+            <label className="text-xs font-mono font-bold text-ink uppercase">Username</label>
             <div className="relative">
-              <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-gray-500">
+              <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-ink/50">
                 <User className="size-4" />
               </span>
               <input
                 type="text"
                 placeholder="Enter your username"
-                className="w-full pl-10 pr-4 py-3 bg-slate-950 border border-slate-800 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all font-medium"
+                className="w-full pl-10 pr-4 py-3 bg-canvas border-2 border-ink/20 text-ink placeholder-ink/40 focus:outline-none focus:border-ink transition-colors font-mono text-sm"
                 {...register("username", { required: "Username is required" })}
               />
             </div>
             {errors.username && (
-              <p className="text-red-500 text-xs font-semibold mt-0.5">
+              <p className="text-red-600 text-xs font-mono font-bold mt-0.5">
                 {errors.username.message}
               </p>
             )}
           </div>
 
-          {/* Email */}
           <div className="flex flex-col gap-1.5">
-            <label className="text-sm font-semibold text-gray-300">Email</label>
+            <label className="text-xs font-mono font-bold text-ink uppercase">Email</label>
             <div className="relative">
-              <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-gray-500">
+              <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-ink/50">
                 <Mail className="size-4" />
               </span>
               <input
                 type="email"
                 placeholder="Enter your email"
-                className="w-full pl-10 pr-4 py-3 bg-slate-950 border border-slate-800 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all font-medium"
+                className="w-full pl-10 pr-4 py-3 bg-canvas border-2 border-ink/20 text-ink placeholder-ink/40 focus:outline-none focus:border-ink transition-colors font-mono text-sm"
                 {...register("email", { required: "Email is required" })}
               />
             </div>
             {errors.email && (
-              <p className="text-red-500 text-xs font-semibold mt-0.5">
+              <p className="text-red-600 text-xs font-mono font-bold mt-0.5">
                 {errors.email.message}
               </p>
             )}
           </div>
 
-          {/* Password */}
           <div className="flex flex-col gap-1.5">
-            <label className="text-sm font-semibold text-gray-300">Password</label>
+            <label className="text-xs font-mono font-bold text-ink uppercase">Password</label>
             <div className="relative">
-              <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-gray-500">
+              <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-ink/50">
                 <Lock className="size-4" />
               </span>
               <input
                 type={showPassword ? "text" : "password"}
                 placeholder="Create password"
-                className="w-full pl-10 pr-10 py-3 bg-slate-950 border border-slate-800 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all font-medium"
+                className="w-full pl-10 pr-10 py-3 bg-canvas border-2 border-ink/20 text-ink placeholder-ink/40 focus:outline-none focus:border-ink transition-colors font-mono text-sm"
                 {...register("password", { required: "Password is required" })}
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-gray-500 hover:text-gray-300 cursor-target"
+                className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-ink/50 hover:text-ink cursor-pointer"
               >
                 {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
               </button>
             </div>
             {errors.password && (
-              <p className="text-red-500 text-xs font-semibold mt-0.5">
+              <p className="text-red-600 text-xs font-mono font-bold mt-0.5">
                 {errors.password.message}
               </p>
             )}
           </div>
 
-          {/* Confirm Password */}
           <div className="flex flex-col gap-1.5">
-            <label className="text-sm font-semibold text-gray-300">Confirm Password</label>
+            <label className="text-xs font-mono font-bold text-ink uppercase">Confirm Password</label>
             <div className="relative">
-              <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-gray-500">
+              <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-ink/50">
                 <Lock className="size-4" />
               </span>
               <input
                 type={showPassword ? "text" : "password"}
                 placeholder="Re-enter password"
-                className="w-full pl-10 pr-4 py-3 bg-slate-950 border border-slate-800 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all font-medium"
+                className="w-full pl-10 pr-4 py-3 bg-canvas border-2 border-ink/20 text-ink placeholder-ink/40 focus:outline-none focus:border-ink transition-colors font-mono text-sm"
                 {...register("confirmPassword", {
                   required: "Confirm your password",
                   validate: (value) =>
@@ -150,26 +148,24 @@ const Register = () => {
               />
             </div>
             {errors.confirmPassword && (
-              <p className="text-red-500 text-xs font-semibold mt-0.5">
+              <p className="text-red-600 text-xs font-mono font-bold mt-0.5">
                 {errors.confirmPassword.message}
               </p>
             )}
           </div>
 
-          {/* Submit */}
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-indigo-600 hover:bg-indigo-500 text-white py-3.5 rounded-xl font-bold transition-all shadow-lg shadow-indigo-600/10 active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-1.5 cursor-target text-base mt-2"
+            className="w-full bg-ink text-canvas hover:bg-ink/90 py-3.5 font-mono font-bold uppercase transition-colors flex items-center justify-center gap-2 cursor-pointer mt-2 disabled:opacity-50 disabled:cursor-not-allowed border-2 border-transparent"
           >
             {loading ? "Registering..." : "Register"}
             {!loading && <ArrowRight className="size-4" />}
           </button>
 
-          {/* Login Link */}
-          <p className="text-center text-sm text-gray-400 font-normal mt-2">
+          <p className="text-center text-xs text-ink/60 font-mono mt-2 uppercase">
             Already have an account?{" "}
-            <Link to="/login" className="text-indigo-400 font-bold hover:underline">
+            <Link to="/login" className="text-ink font-bold hover:underline">
               Sign In
             </Link>
           </p>

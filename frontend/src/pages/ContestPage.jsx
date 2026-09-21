@@ -3,6 +3,7 @@ import { useParams, Link, useLocation } from "react-router-dom";
 import { useAuth } from "../context/User.jsx";
 import { toast } from "react-toastify";
 import { Clock, Lock, Trophy, Sparkles, Unlock, Calendar, Check, ArrowLeft, ArrowRight, Play } from "lucide-react";
+import AnnotationMarker from "../components/AnnotationMarker.jsx";
 
 const ContestPage = () => {
   const { contestCode } = useParams();
@@ -154,18 +155,15 @@ const ContestPage = () => {
 
   if (loading)
     return (
-      <div className="flex items-center justify-center min-h-screen bg-slate-950">
-        <div className="text-center">
-          <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-500 mb-4"></div>
-          <h2 className="text-xl font-semibold text-gray-400">Loading Contest...</h2>
-        </div>
+      <div className="flex items-center justify-center min-h-[70vh] bg-canvas">
+        <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-4 border-ink"></div>
       </div>
     );
 
   if (error)
     return (
-      <div className="flex items-center justify-center min-h-screen bg-slate-950">
-        <h2 className="text-center text-red-500 text-xl font-semibold">{error}</h2>
+      <div className="flex items-center justify-center min-h-[70vh] bg-canvas">
+        <h2 className="text-center text-accentCoral font-bold font-mono text-xl">{error}</h2>
       </div>
     );
 
@@ -174,16 +172,16 @@ const ContestPage = () => {
   const isUpcoming = timeLeft !== null;
 
   return (
-    <div className="w-[90%] max-w-7xl mx-auto py-12 bg-slate-950 min-h-screen">
+    <div className="w-[90%] max-w-5xl mx-auto py-12 bg-canvas min-h-[80vh] blueprint-grid">
 
       {/* Navigation Breadcrumbs / Links */}
-      <div className="flex gap-6 border-b border-slate-900 mb-8 text-sm font-semibold animate-fade-in">
+      <div className="flex gap-6 border-b-2 border-ink/20 mb-8 font-mono text-[10px] font-bold uppercase tracking-wider">
         <a
           href={location.pathname}
-          className={`pb-3 transition-all ${
+          className={`pb-3 border-b-2 transition-all ${
             location.pathname.endsWith(`/contest/${contestCode}`)
-              ? "text-indigo-400 border-b-2 border-indigo-400"
-              : "text-gray-500 hover:text-gray-300"
+              ? "text-ink border-ink"
+              : "text-ink-muted border-transparent hover:text-ink hover:border-ink/50"
           }`}
         >
           Problems
@@ -191,10 +189,10 @@ const ContestPage = () => {
 
         <a
           href={`${location.pathname}/submit`}
-          className={`pb-3 transition-all ${
+          className={`pb-3 border-b-2 transition-all ${
             location.pathname.includes("/submit")
-              ? "text-indigo-400 border-b-2 border-indigo-400"
-              : "text-gray-500 hover:text-gray-300"
+              ? "text-ink border-ink"
+              : "text-ink-muted border-transparent hover:text-ink hover:border-ink/50"
           }`}
         >
           Submit
@@ -202,10 +200,10 @@ const ContestPage = () => {
 
         <a
           href={`${location.pathname}/submissions/my`}
-          className={`pb-3 transition-all ${
+          className={`pb-3 border-b-2 transition-all ${
             location.pathname.includes("/submissions/my")
-              ? "text-indigo-400 border-b-2 border-indigo-400"
-              : "text-gray-500 hover:text-gray-300"
+              ? "text-ink border-ink"
+              : "text-ink-muted border-transparent hover:text-ink hover:border-ink/50"
           }`}
         >
           My Submissions
@@ -213,47 +211,46 @@ const ContestPage = () => {
       </div>
 
       {/* Header card */}
-      <div className="border border-slate-900 bg-slate-900/10 backdrop-blur-sm p-8 rounded-3xl mb-8 relative overflow-hidden">
-        <div className="absolute right-0 top-0 w-32 h-32 bg-indigo-500/5 rounded-full blur-3xl" />
+      <div className="border-2 border-ink bg-surface shadow-[4px_4px_0_0_#17181A] p-8 rounded-lg mb-8 relative overflow-hidden">
         <div className="flex justify-between items-start flex-wrap gap-4">
           <div className="space-y-1">
-            <h1 className="text-3xl md:text-4xl font-extrabold text-white tracking-tight">
+            <h1 className="text-3xl md:text-4xl font-bold font-mono text-ink tracking-tight mb-2">
               {contest.contestName}
             </h1>
-            <h3 className="text-gray-500 text-sm font-semibold uppercase tracking-wider">
+            <h3 className="font-mono text-sm font-bold uppercase tracking-wider text-ink-soft">
               Contest Code: {contest.contestCode}
             </h3>
           </div>
           {isUpcoming && (
-            <span className="inline-flex items-center gap-1 px-3.5 py-1 rounded-full text-xs font-bold border border-emerald-500/25 bg-emerald-500/10 text-emerald-400 uppercase tracking-wide animate-pulse">
+            <span className="inline-flex items-center gap-1 px-3 py-1 rounded-pill text-[10px] font-mono font-bold border-2 border-ink bg-lime text-ink uppercase tracking-wider">
               <Sparkles className="size-3" />
               Registration Open
             </span>
           )}
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8 pt-6 border-t border-slate-900/60 text-sm text-gray-400">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8 pt-6 border-t-2 border-ink/20 text-ink">
           <div className="flex items-center gap-2.5">
-            <Calendar className="size-4.5 text-indigo-400" />
+            <Calendar className="size-5 text-ink-muted" />
             <div>
-              <span className="block text-gray-500 text-xs font-semibold uppercase tracking-wider">Start Time</span>
-              <span className="text-gray-200 font-medium">{new Date(contest.startTime).toLocaleString()}</span>
+              <span className="block text-ink-muted font-mono text-[10px] font-bold uppercase tracking-wider">Start Time</span>
+              <span className="font-bold">{new Date(contest.startTime).toLocaleString()}</span>
             </div>
           </div>
 
           <div className="flex items-center gap-2.5">
-            <Clock className="size-4.5 text-purple-400" />
+            <Clock className="size-5 text-ink-muted" />
             <div>
-              <span className="block text-gray-500 text-xs font-semibold uppercase tracking-wider">Duration</span>
-              <span className="text-gray-200 font-medium">{contest.duration} minutes</span>
+              <span className="block text-ink-muted font-mono text-[10px] font-bold uppercase tracking-wider">Duration</span>
+              <span className="font-bold">{contest.duration} minutes</span>
             </div>
           </div>
 
           <div className="flex items-center gap-2.5">
-            <Trophy className="size-4.5 text-amber-400" />
+            <Trophy className="size-5 text-ink-muted" />
             <div>
-              <span className="block text-gray-500 text-xs font-semibold uppercase tracking-wider">Contest Rating</span>
-              <span className="text-gray-200 font-medium">{contest.rated ? "Rated Contest" : "Unrated Practice"}</span>
+              <span className="block text-ink-muted font-mono text-[10px] font-bold uppercase tracking-wider">Contest Rating</span>
+              <span className="font-bold">{contest.rated ? "Rated Contest" : "Unrated Practice"}</span>
             </div>
           </div>
         </div>
@@ -263,89 +260,89 @@ const ContestPage = () => {
       {isUpcoming ? (
         <div className="grid md:grid-cols-2 gap-8 my-8">
           {/* Countdown Card */}
-          <div className="bg-slate-900 border border-slate-800 rounded-3xl p-8 shadow-xl flex flex-col justify-center items-center text-center">
-            <h3 className="text-xs font-bold tracking-widest text-indigo-400 uppercase mb-6 flex items-center gap-1.5">
-              <Clock className="size-3.5" />
+          <div className="bg-surface border-2 border-ink rounded-lg shadow-[4px_4px_0_0_#17181A] p-8 flex flex-col justify-center items-center text-center">
+            <h3 className="text-[10px] font-mono font-bold tracking-wider text-ink-muted uppercase mb-6 flex items-center gap-1.5">
+              <Clock className="size-4" />
               CONTEST BEGINS IN
             </h3>
             <div className="flex gap-4">
               {timeLeft.days > 0 && (
                 <div className="flex flex-col">
-                  <span className="text-4xl md:text-5xl font-extrabold text-white tracking-tight">{timeLeft.days}</span>
-                  <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mt-1">Days</span>
+                  <span className="text-4xl md:text-5xl font-bold font-mono text-ink tracking-tight">{timeLeft.days}</span>
+                  <span className="text-[10px] font-mono font-bold text-ink-muted uppercase tracking-widest mt-1">Days</span>
                 </div>
               )}
               <div className="flex flex-col">
-                <span className="text-4xl md:text-5xl font-extrabold text-white tracking-tight">
+                <span className="text-4xl md:text-5xl font-bold font-mono text-ink tracking-tight">
                   {String(timeLeft.hours).padStart(2, '0')}
                 </span>
-                <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mt-1">Hrs</span>
+                <span className="text-[10px] font-mono font-bold text-ink-muted uppercase tracking-widest mt-1">Hrs</span>
               </div>
-              <span className="text-4xl md:text-5xl font-bold text-indigo-500 animate-pulse">:</span>
+              <span className="text-4xl md:text-5xl font-bold font-mono text-ink-muted">:</span>
               <div className="flex flex-col">
-                <span className="text-4xl md:text-5xl font-extrabold text-white tracking-tight">
+                <span className="text-4xl md:text-5xl font-bold font-mono text-ink tracking-tight">
                   {String(timeLeft.minutes).padStart(2, '0')}
                 </span>
-                <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mt-1">Mins</span>
+                <span className="text-[10px] font-mono font-bold text-ink-muted uppercase tracking-widest mt-1">Mins</span>
               </div>
-              <span className="text-4xl md:text-5xl font-bold text-indigo-500 animate-pulse">:</span>
+              <span className="text-4xl md:text-5xl font-bold font-mono text-ink-muted">:</span>
               <div className="flex flex-col">
-                <span className="text-4xl md:text-5xl font-extrabold text-white tracking-tight">
+                <span className="text-4xl md:text-5xl font-bold font-mono text-ink tracking-tight">
                   {String(timeLeft.seconds).padStart(2, '0')}
                 </span>
-                <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mt-1">Secs</span>
+                <span className="text-[10px] font-mono font-bold text-ink-muted uppercase tracking-widest mt-1">Secs</span>
               </div>
             </div>
           </div>
 
           {/* Registration Card */}
-          <div className="bg-slate-900 border border-slate-800 rounded-3xl p-8 shadow-xl flex flex-col justify-between">
-            <div className="space-y-2">
-              <h3 className="text-xl font-bold text-white tracking-tight">Participation Entry</h3>
-              <p className="text-gray-400 leading-relaxed font-normal text-sm">
+          <div className="bg-surface border-2 border-ink rounded-lg shadow-[4px_4px_0_0_#17181A] p-8 flex flex-col justify-between">
+            <div className="space-y-2 mb-6">
+              <h3 className="text-xl font-bold text-ink tracking-tight">Participation Entry</h3>
+              <p className="text-ink-soft leading-relaxed font-mono text-xs">
                 Register to take part in this session. Choosing **Rated** affects your rating stats; choosing **Unrated** lets you compete casually.
               </p>
             </div>
 
             {registrationStatus?.registered ? (
-              <div className="bg-emerald-500/5 border border-emerald-500/20 rounded-2xl p-6 text-center animate-scale-in mt-6">
-                <div className="inline-flex items-center justify-center size-10 rounded-full bg-emerald-500/10 text-emerald-400 mb-3 border border-emerald-500/20">
+              <div className="bg-lime/20 border-2 border-ink rounded-md p-6 text-center mt-auto">
+                <div className="inline-flex items-center justify-center size-10 rounded-full bg-lime border-2 border-ink text-ink mb-3">
                   <Check className="size-5" />
                 </div>
-                <h4 className="text-base font-extrabold text-emerald-400 mb-1">You Are Registered!</h4>
-                <p className="text-gray-400 text-xs font-semibold uppercase tracking-wider">
-                  Registration type: <span className="text-indigo-400 underline">{registrationStatus.isRated ? "Rated Participant" : "Unrated Participant"}</span>
+                <h4 className="text-base font-bold text-ink mb-1">You Are Registered!</h4>
+                <p className="text-ink-muted font-mono text-[10px] font-bold uppercase tracking-wider">
+                  Registration type: <span className="text-ink underline">{registrationStatus.isRated ? "Rated Participant" : "Unrated Participant"}</span>
                 </p>
               </div>
             ) : (
-              <div className="space-y-4 mt-6">
+              <div className="space-y-4 mt-auto">
                 {userData ? (
                   <div className="grid grid-cols-2 gap-4">
                     <button
                       onClick={() => handleRegister(true)}
                       disabled={registering}
-                      className="bg-indigo-600 hover:bg-indigo-500 text-white py-3.5 px-4 rounded-2xl font-bold text-sm transition-all hover:scale-[1.02] shadow-lg shadow-indigo-600/15 disabled:opacity-50 cursor-target flex flex-col items-center justify-center gap-0.5"
+                      className="bg-ink text-canvas hover:opacity-90 py-3.5 px-4 rounded-md font-mono font-bold text-xs transition-all shadow-[2px_2px_0_0_#17181A] disabled:opacity-50 flex flex-col items-center justify-center gap-0.5 border-2 border-ink"
                     >
-                      <span>Rated Entry</span>
-                      <span className="text-[9px] opacity-70 font-normal">Alters global rating</span>
+                      <span className="uppercase">Rated Entry</span>
+                      <span className="text-[9px] opacity-80 font-normal">Alters global rating</span>
                     </button>
                     <button
                       onClick={() => handleRegister(false)}
                       disabled={registering}
-                      className="border border-slate-800 bg-slate-950 hover:bg-slate-800 text-gray-300 hover:text-white py-3.5 px-4 rounded-2xl font-bold text-sm transition-all hover:scale-[1.02] disabled:opacity-50 cursor-target flex flex-col items-center justify-center gap-0.5"
+                      className="border-2 border-ink bg-surface hover:bg-ink/5 text-ink py-3.5 px-4 rounded-md font-mono font-bold text-xs transition-all shadow-[2px_2px_0_0_#17181A] disabled:opacity-50 flex flex-col items-center justify-center gap-0.5"
                     >
-                      <span>Unrated Entry</span>
-                      <span className="text-[9px] opacity-70 font-normal text-gray-500">Casual practice</span>
+                      <span className="uppercase">Unrated Entry</span>
+                      <span className="text-[9px] text-ink-muted font-normal">Casual practice</span>
                     </button>
                   </div>
                 ) : (
-                  <div className="text-center py-6 bg-slate-950 rounded-2xl border border-dashed border-slate-800">
-                    <p className="text-gray-400 font-semibold text-sm mb-3">Sign in to register for the contest</p>
+                  <div className="text-center py-6 bg-canvas rounded-md border-2 border-dashed border-ink">
+                    <p className="text-ink-muted font-mono text-[10px] font-bold uppercase tracking-wider mb-3">Sign in to register for the contest</p>
                     <Link
                       to="/login"
-                      className="inline-flex items-center gap-1.5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-6 py-2.5 rounded-xl text-sm transition-all shadow-md cursor-target"
+                      className="inline-flex items-center gap-1.5 bg-ink text-canvas font-mono uppercase font-bold text-xs px-6 py-2.5 rounded-md shadow-[2px_2px_0_0_#17181A] transition-all border-2 border-ink"
                     >
-                      <Play className="size-3.5 fill-white" />
+                      <Play className="size-3.5" />
                       Login Now
                     </Link>
                   </div>
@@ -357,29 +354,32 @@ const ContestPage = () => {
       ) : null}
 
       {/* Problems Section */}
-      <h2 className="text-2xl font-bold mb-5 text-white tracking-tight animate-fade-in">Problems</h2>
+      <div className="flex items-center mb-5 gap-2">
+        <AnnotationMarker label="CONTEST SET" />
+        <h2 className="text-2xl font-bold font-mono text-ink tracking-tight ml-2">Problems</h2>
+      </div>
 
       {isUpcoming ? (
-        <div className="bg-slate-900/30 border border-dashed border-slate-800 rounded-3xl p-12 text-center my-4 animate-fade-in flex flex-col items-center justify-center">
-          <div className="inline-flex items-center justify-center size-14 rounded-full bg-slate-900 border border-slate-800 text-indigo-400 mb-4 shadow-xl">
+        <div className="bg-canvas border-2 border-dashed border-ink rounded-lg p-12 text-center my-4 flex flex-col items-center justify-center">
+          <div className="inline-flex items-center justify-center size-14 rounded-full bg-surface border-2 border-ink text-ink-muted mb-4 shadow-[2px_2px_0_0_#17181A]">
             <Lock className="size-6" />
           </div>
-          <h3 className="text-lg font-bold text-gray-300 mb-2">Problems Locked</h3>
-          <p className="text-gray-500 max-w-sm mx-auto font-normal text-sm">
+          <h3 className="text-lg font-bold text-ink mb-2">Problems Locked</h3>
+          <p className="text-ink-soft max-w-sm mx-auto font-mono text-xs">
             The problems set for this contest will reveal and unlock automatically as soon as the start time hits.
           </p>
         </div>
       ) : problems.length === 0 ? (
-        <p className="text-gray-500 text-sm">No problems found for this contest.</p>
+        <p className="text-ink-muted font-mono text-sm uppercase tracking-wider">No problems found for this contest.</p>
       ) : (
-        <div className="overflow-x-auto border border-slate-900 rounded-2xl bg-slate-950 animate-fade-in shadow-xl">
+        <div className="border-2 border-ink rounded-lg bg-surface shadow-[4px_4px_0_0_#17181A] overflow-hidden">
           <table className="w-full border-collapse">
-            <thead className="border-b border-slate-900 bg-slate-900/20">
-              <tr className="text-center">
-                <th className="p-4 font-bold text-xs uppercase tracking-wider text-gray-500">Index</th>
-                <th className="p-4 font-bold text-xs uppercase tracking-wider text-gray-500 text-left pl-6">Problem Title</th>
-                <th className="p-4 font-bold text-xs uppercase tracking-wider text-gray-500">Rating</th>
-                <th className="p-4 font-bold text-xs uppercase tracking-wider text-gray-500">Solve</th>
+            <thead className="border-b-2 border-ink bg-canvas/50">
+              <tr>
+                <th className="p-4 font-mono font-bold text-[10px] uppercase tracking-wider text-ink text-center border-r-2 border-ink/20">Index</th>
+                <th className="p-4 font-mono font-bold text-[10px] uppercase tracking-wider text-ink text-left border-r-2 border-ink/20">Problem Title</th>
+                <th className="p-4 font-mono font-bold text-[10px] uppercase tracking-wider text-ink text-center border-r-2 border-ink/20">Rating</th>
+                <th className="p-4 font-mono font-bold text-[10px] uppercase tracking-wider text-ink text-center">Action</th>
               </tr>
             </thead>
 
@@ -387,26 +387,26 @@ const ContestPage = () => {
               {problems.map((p, i) => (
                 <tr
                   key={i}
-                  className="table-row-anim animate-fade-in-up text-center border-b border-slate-900 hover:bg-slate-900/10 transition-colors"
+                  className="border-b border-ink/20 hover:bg-ink/5 transition-colors last:border-0"
                 >
-                  <td className="p-4 font-extrabold text-gray-300">{p.index}</td>
-                  <td className="p-4 text-left pl-6 font-bold text-gray-200 hover:text-indigo-400 transition-colors">
-                    <Link to={`/contest/${contestCode}/problem/${p.probCode}`}>
+                  <td className="p-4 font-mono text-sm font-bold text-ink-muted text-center border-r-2 border-ink/20">{p.index}</td>
+                  <td className="p-4 text-left font-bold text-ink border-r-2 border-ink/20">
+                    <Link to={`/contest/${contestCode}/problem/${p.probCode}`} className="hover:underline">
                       {p.probName}
                     </Link>
                   </td>
-                  <td className="p-4">
-                    <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-slate-900 border border-slate-800 text-gray-400">
+                  <td className="p-4 text-center border-r-2 border-ink/20">
+                    <span className="px-2 py-0.5 rounded-pill font-mono text-[10px] font-bold uppercase tracking-wider border-2 border-ink text-ink bg-surface">
                       {p.probRating}
                     </span>
                   </td>
-                  <td className="p-4">
+                  <td className="p-4 text-center">
                     <Link
                       to={`/contest/${contestCode}/problem/${p.probCode}`}
-                      className="inline-flex items-center gap-1 bg-slate-900 hover:bg-indigo-600 text-gray-300 hover:text-white border border-slate-800 hover:border-indigo-500/20 px-4 py-2 rounded-xl font-bold text-xs shadow-md transition-all cursor-target"
+                      className="inline-flex items-center justify-center gap-1.5 px-4 py-2 border-2 border-ink bg-surface hover:bg-ink hover:text-canvas text-ink font-bold font-mono uppercase text-[10px] tracking-wider rounded-md transition-colors shadow-[2px_2px_0_0_#17181A] hover:shadow-none translate-y-0 hover:translate-y-[2px] translate-x-0 hover:translate-x-[2px]"
                     >
                       Solve
-                      <ArrowRight className="size-3.5" />
+                      <ArrowRight className="size-3" />
                     </Link>
                   </td>
                 </tr>
