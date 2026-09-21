@@ -5,6 +5,7 @@ import { useAuth } from "../context/User.jsx";
 import { useNavigate, Link } from "react-router-dom";
 import { toast } from "react-toastify";
 import { User, Lock, Eye, EyeOff, LogIn, ArrowRight } from "lucide-react";
+import AnnotationMarker from "../components/AnnotationMarker.jsx";
 
 const Login = () => {
   const { setUserData } = useAuth();
@@ -48,89 +49,86 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-950 px-4 relative overflow-hidden">
-      {/* Background Glows */}
-      <div className="absolute top-1/4 left-1/4 size-96 bg-indigo-500/5 rounded-full blur-3xl" />
-      <div className="absolute bottom-1/4 right-1/4 size-96 bg-purple-500/5 rounded-full blur-3xl" />
-
-      <div className="w-full max-w-md bg-slate-900/60 border border-slate-800 backdrop-blur-md rounded-2xl p-8 shadow-2xl animate-scale-in">
-        <div className="text-center mb-8">
-          <div className="size-12 bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 rounded-xl flex items-center justify-center mx-auto mb-4">
-            <LogIn className="size-6" />
+    <div className="min-h-screen flex items-center justify-center bg-canvas blueprint-grid px-4 relative">
+      <div className="w-full max-w-md bg-surface border-2 border-ink p-8 shadow-[4px_4px_0_0_#17181A] relative">
+        <AnnotationMarker top left />
+        <AnnotationMarker top right />
+        <AnnotationMarker bottom left />
+        <AnnotationMarker bottom right />
+        
+        <div className="text-center mb-8 relative z-10">
+          <div className="size-12 bg-canvas border-2 border-ink flex items-center justify-center mx-auto mb-4 shadow-[2px_2px_0_0_#17181A]">
+            <LogIn className="size-6 text-ink" />
           </div>
-          <h2 className="text-3xl font-extrabold text-white mb-2 tracking-tight">
+          <h2 className="text-3xl font-bold font-mono text-ink mb-2 tracking-tight uppercase">
             Welcome Back
           </h2>
-          <p className="text-gray-400 text-sm font-normal">
-            Sign in to start coding and participating
+          <p className="text-ink/60 text-sm font-mono uppercase">
+            Sign in to continue
           </p>
         </div>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-5">
-          {/* Username */}
+        <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-5 relative z-10">
           <div className="flex flex-col gap-1.5">
-            <label className="text-sm font-semibold text-gray-300">Username</label>
+            <label className="text-xs font-mono font-bold text-ink uppercase">Username</label>
             <div className="relative">
-              <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-gray-500">
+              <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-ink/50">
                 <User className="size-4" />
               </span>
               <input
                 type="text"
                 {...register("username", { required: "Username is required" })}
                 placeholder="Enter your username"
-                className="w-full pl-10 pr-4 py-3 bg-slate-950 border border-slate-800 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all font-medium"
+                className="w-full pl-10 pr-4 py-3 bg-canvas border-2 border-ink/20 text-ink placeholder-ink/40 focus:outline-none focus:border-ink transition-colors font-mono text-sm"
               />
             </div>
             {errors.username && (
-              <p className="text-red-500 text-xs font-semibold mt-0.5">
+              <p className="text-red-600 text-xs font-mono font-bold mt-0.5">
                 {errors.username.message}
               </p>
             )}
           </div>
 
-          {/* Password */}
           <div className="flex flex-col gap-1.5">
-            <label className="text-sm font-semibold text-gray-300">Password</label>
+            <label className="text-xs font-mono font-bold text-ink uppercase">Password</label>
             <div className="relative">
-              <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-gray-500">
+              <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-ink/50">
                 <Lock className="size-4" />
               </span>
               <input
                 type={showPassword ? "text" : "password"}
                 {...register("password", { required: "Password is required" })}
                 placeholder="Enter your password"
-                className="w-full pl-10 pr-10 py-3 bg-slate-950 border border-slate-800 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all font-medium"
+                className="w-full pl-10 pr-10 py-3 bg-canvas border-2 border-ink/20 text-ink placeholder-ink/40 focus:outline-none focus:border-ink transition-colors font-mono text-sm"
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-gray-500 hover:text-gray-300 cursor-target"
+                className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-ink/50 hover:text-ink cursor-pointer"
               >
                 {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
               </button>
             </div>
             {errors.password && (
-              <p className="text-red-500 text-xs font-semibold mt-0.5">
+              <p className="text-red-600 text-xs font-mono font-bold mt-0.5">
                 {errors.password.message}
               </p>
             )}
           </div>
 
-          {/* Submit Button */}
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-indigo-600 hover:bg-indigo-500 text-white py-3.5 rounded-xl font-bold transition-all shadow-lg shadow-indigo-600/10 active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-1.5 cursor-target text-base mt-2"
+            className="w-full bg-ink text-canvas hover:bg-ink/90 py-3.5 font-mono font-bold uppercase transition-colors flex items-center justify-center gap-2 cursor-pointer mt-2 disabled:opacity-50 disabled:cursor-not-allowed border-2 border-transparent"
           >
             {loading ? "Signing in..." : "Sign In"}
             {!loading && <ArrowRight className="size-4" />}
           </button>
 
-          {/* Signup link */}
-          <p className="text-center text-sm text-gray-400 font-normal mt-2">
+          <p className="text-center text-xs text-ink/60 font-mono mt-2 uppercase">
             Don't have an account?{" "}
-            <Link to="/register" className="text-indigo-400 font-bold hover:underline">
-              Create an account
+            <Link to="/register" className="text-ink font-bold hover:underline">
+              Create one
             </Link>
           </p>
         </form>
