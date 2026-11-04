@@ -171,43 +171,40 @@ const ContestPage = () => {
 
   const isUpcoming = timeLeft !== null;
 
+  // ── Nav tab helpers ──────────────────────────────────────────────────────
+  const basePath = `/contest/${contestCode}`;
+  const tabs = [
+    { label: "Problems",       href: basePath },
+    { label: "My Submissions", href: `${basePath}/submissions/my` },
+    { label: "Standings",      href: `${basePath}/standings` },
+  ];
+
+  const activeTab = (href) => {
+    if (href === basePath) {
+      // "Problems" is active only on the exact contest page (not sub-pages)
+      return location.pathname === basePath;
+    }
+    return location.pathname.startsWith(href);
+  };
+
   return (
     <div className="w-[90%] max-w-5xl mx-auto py-12 bg-canvas min-h-[80vh] blueprint-grid">
 
-      {/* Navigation Breadcrumbs / Links */}
+      {/* Navigation Tabs */}
       <div className="flex gap-6 border-b-2 border-ink/20 mb-8 font-mono text-[10px] font-bold uppercase tracking-wider">
-        <a
-          href={location.pathname}
-          className={`pb-3 border-b-2 transition-all ${
-            location.pathname.endsWith(`/contest/${contestCode}`)
-              ? "text-ink border-ink"
-              : "text-ink-muted border-transparent hover:text-ink hover:border-ink/50"
-          }`}
-        >
-          Problems
-        </a>
-
-        <a
-          href={`${location.pathname}/submit`}
-          className={`pb-3 border-b-2 transition-all ${
-            location.pathname.includes("/submit")
-              ? "text-ink border-ink"
-              : "text-ink-muted border-transparent hover:text-ink hover:border-ink/50"
-          }`}
-        >
-          Submit
-        </a>
-
-        <a
-          href={`${location.pathname}/submissions/my`}
-          className={`pb-3 border-b-2 transition-all ${
-            location.pathname.includes("/submissions/my")
-              ? "text-ink border-ink"
-              : "text-ink-muted border-transparent hover:text-ink hover:border-ink/50"
-          }`}
-        >
-          My Submissions
-        </a>
+        {tabs.map((tab) => (
+          <a
+            key={tab.href}
+            href={tab.href}
+            className={`pb-3 border-b-2 transition-all ${
+              activeTab(tab.href)
+                ? "text-ink border-ink"
+                : "text-ink-muted border-transparent hover:text-ink hover:border-ink/50"
+            }`}
+          >
+            {tab.label}
+          </a>
+        ))}
       </div>
 
       {/* Header card */}

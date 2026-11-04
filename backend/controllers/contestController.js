@@ -286,3 +286,158 @@ export const getRegistrationStatus = async (req, res) => {
         return res.status(500).json({ success: false, message: error.message });
     }
 };
+
+
+// ---------------------------------------------------------------------------
+// GET /contest/:contestCode/standings
+// ICPC-style standings: rank by solved desc, then penalty asc.
+// Penalty = solve_time_in_minutes + 20min × wrong_attempts_before_AC per problem.
+// Only submissions within the contest window count.
+// Only registered participants appear in the table.
+// ---------------------------------------------------------------------------
+export const getContestStandings = async (req, res) => {
+    try {
+        const { contestCode } = req.params;
+
+        // 1. Fetch contest metadata + its problem list
+        const { data: contest, error: contestError } = await supabase
+            .from('contests')
+            .select('id, start_time, duration, contest_problems(problem_id, index_code)')
+            .eq('contest_code', contestCode)
+            .maybeSingle();
+
+        if (contestError || !contest) {
+            return res.status(404).json({ success: false, message: 'Contest not found' });
+        }
+
+        const contestStart = new Date(contest.start_time);
+        const contestEnd   = new Date(contestStart.getTime() + contest.duration * 60 * 1000);
+
+        // Build ordered list of problem index letters  e.g. ['A','B','C']
+        const problemIndices = (contest.contest_problems || [])
+            .map(cp => cp.index_code)
+            .sort();
+
+        // 2. Fetch all registered participants
+        const { data: registrations, error: regError } = await supabase
+            .from('contest_registrations')
+            .select('user_id, is_rated, profiles(username)')
+            .eq('contest_id', contest.id);
+
+        if (regError) {
+            return res.status(500).json({ success: false, message: regError.message });
+        }
+
+        if (!registrations || registrations.length === 0) {
+            return res.status(200).json({ success: true, standings: [], problemIndices });
+        }
+
+        // Map userId → { username, is_rated }
+        const participantMap = {};
+        for (const reg of registrations) {
+            const username = reg.profiles?.username || reg.user_id;
+            participantMap[reg.user_id] = { username, isRated: reg.is_rated };
+        }
+
+        // 3. Fetch all submissions for this contest within the contest window
+        const { data: submissions, error: subError } = await supabase
+            .from('submissions')
+            .select('user_id, username, problem_code, verdict, created_at')
+            .like('problem_code', `${contestCode}%`)
+            .gte('created_at', contestStart.toISOString())
+            .lte('created_at', contestEnd.toISOString())
+            .order('created_at', { ascending: true });
+
+        if (subError) {
+            return res.status(500).json({ success: false, message: subError.message });
+        }
+
+        // 4. Build per-user, per-problem submission state
+        //    Seed every registered user so they appear even with 0 solves
+        const userData = {};
+        for (const [userId, info] of Object.entries(participantMap)) {
+            userData[userId] = { username: info.username, isRated: info.isRated, problems: {} };
+            for (const idx of problemIndices) {
+                userData[userId].problems[idx] = { attempts: 0, firstAcTime: null, verdict: null };
+            }
+        }
+
+        // Process submissions (already ordered ascending by time)
+        for (const sub of submissions || []) {
+            const userId = sub.user_id;
+            if (!userData[userId]) continue; // skip non-registered submitters
+
+            // Derive index letter: 'CODEFORCE2026A' - 'CODEFORCE2026' = 'A'
+            const index = sub.problem_code.replace(contestCode, '');
+            if (!problemIndices.includes(index)) continue;
+
+            const cell = userData[userId].problems[index];
+            if (cell.firstAcTime !== null) continue; // already solved; ignore further subs
+
+            if (sub.verdict === 'AC') {
+                const solveMs  = new Date(sub.created_at) - contestStart;
+                cell.firstAcTime = Math.floor(solveMs / 60000);
+                cell.verdict     = 'AC';
+            } else {
+                cell.attempts += 1;
+                cell.verdict   = sub.verdict;
+            }
+        }
+
+        // 5. Compute scores and build rows
+        const rows = [];
+        for (const [userId, info] of Object.entries(userData)) {
+            let solved  = 0;
+            let penalty = 0;
+            const problemCells = {};
+
+            for (const idx of problemIndices) {
+                const cell = info.problems[idx];
+                if (cell.firstAcTime !== null) {
+                    const probPenalty = cell.firstAcTime + cell.attempts * 20;
+                    solved  += 1;
+                    penalty += probPenalty;
+                    problemCells[idx] = {
+                        verdict:  'AC',
+                        attempts: cell.attempts + 1, // includes the AC attempt
+                        time:     cell.firstAcTime,
+                        penalty:  probPenalty,
+                    };
+                } else {
+                    problemCells[idx] = {
+                        verdict:  cell.attempts > 0 ? (cell.verdict || 'WA') : null,
+                        attempts: cell.attempts,
+                        time:     null,
+                        penalty:  0,
+                    };
+                }
+            }
+
+            rows.push({ userId, username: info.username, isRated: info.isRated, solved, penalty, problems: problemCells });
+        }
+
+        // 6. Sort: solved desc → penalty asc
+        rows.sort((a, b) => b.solved !== a.solved ? b.solved - a.solved : a.penalty - b.penalty);
+
+        // 7. Assign ranks (ties share the same rank)
+        let rank = 1;
+        for (let i = 0; i < rows.length; i++) {
+            if (i > 0 && (rows[i].solved !== rows[i - 1].solved || rows[i].penalty !== rows[i - 1].penalty)) {
+                rank = i + 1;
+            }
+            rows[i].rank = rank;
+        }
+
+        return res.status(200).json({
+            success: true,
+            contestCode,
+            problemIndices,
+            contestStart: contestStart.toISOString(),
+            contestEnd:   contestEnd.toISOString(),
+            standings: rows,
+        });
+
+    } catch (error) {
+        return res.status(500).json({ success: false, message: error.message });
+    }
+};
