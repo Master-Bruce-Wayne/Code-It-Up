@@ -120,6 +120,29 @@ const SubmissionsPage = () => {
 
     return (
         <div className="w-[90%] max-w-5xl mx-auto py-12 bg-canvas min-h-[80vh] blueprint-grid">
+            {/* Contest Navigation Tabs (when in contest context) */}
+            {contestCode && (
+                <div className="flex gap-6 border-b-2 border-ink/20 mb-8 font-mono text-[10px] font-bold uppercase tracking-wider">
+                    <Link
+                        to={`/contest/${contestCode}`}
+                        className="pb-3 border-b-2 border-transparent text-ink-muted hover:text-ink hover:border-ink/50 transition-all"
+                    >
+                        Problems
+                    </Link>
+                    <Link
+                        to={`/contest/${contestCode}/submissions/my`}
+                        className="pb-3 border-b-2 border-ink text-ink transition-all"
+                    >
+                        My Submissions
+                    </Link>
+                    <Link
+                        to={`/contest/${contestCode}/standings`}
+                        className="pb-3 border-b-2 border-transparent text-ink-muted hover:text-ink hover:border-ink/50 transition-all"
+                    >
+                        Standings
+                    </Link>
+                </div>
+            )}
             <div className="mb-10 text-center">
                 <div className="inline-block mb-4">
                     <AnnotationMarker label="SUBMISSIONS" />

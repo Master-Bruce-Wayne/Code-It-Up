@@ -193,9 +193,9 @@ const ContestPage = () => {
       {/* Navigation Tabs */}
       <div className="flex gap-6 border-b-2 border-ink/20 mb-8 font-mono text-[10px] font-bold uppercase tracking-wider">
         {tabs.map((tab) => (
-          <a
+          <Link
             key={tab.href}
-            href={tab.href}
+            to={tab.href}
             className={`pb-3 border-b-2 transition-all ${
               activeTab(tab.href)
                 ? "text-ink border-ink"
@@ -203,7 +203,7 @@ const ContestPage = () => {
             }`}
           >
             {tab.label}
-          </a>
+          </Link>
         ))}
       </div>
 

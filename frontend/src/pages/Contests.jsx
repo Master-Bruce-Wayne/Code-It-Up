@@ -166,13 +166,22 @@ const Contests = () => {
                     </div>
                   </div>
 
-                  {/* Right Button */}
-                  <div className="flex items-center">
+                  {/* Right Action Buttons */}
+                  <div className="flex items-center gap-3 flex-wrap">
+                    {status !== "upcoming" && (
+                      <Link
+                        to={`/contest/${c.contestCode}/standings`}
+                        className="flex items-center justify-center gap-1.5 px-4 py-3 border-2 border-ink bg-surface hover:bg-ink hover:text-canvas text-ink font-bold font-mono uppercase text-xs tracking-wider rounded-md transition-colors shadow-[2px_2px_0_0_#17181A] hover:shadow-none translate-y-0 hover:translate-y-[2px] translate-x-0 hover:translate-x-[2px]"
+                      >
+                        <Trophy className="size-3.5" />
+                        Standings
+                      </Link>
+                    )}
                     <Link
                       to={`/contest/${c.contestCode}`}
                       className="flex items-center justify-center gap-2 w-full lg:w-auto px-6 py-3 border-2 border-ink bg-surface hover:bg-ink hover:text-canvas text-ink font-bold font-mono uppercase tracking-wider rounded-md transition-colors shadow-[2px_2px_0_0_#17181A] hover:shadow-none translate-y-0 hover:translate-y-[2px] translate-x-0 hover:translate-x-[2px]"
                     >
-                      {status === "upcoming" ? "Register / Details" : status === "live" ? "Enter Contest" : "View Results"}
+                      {status === "upcoming" ? "Register / Details" : status === "live" ? "Enter Contest" : "Problems"}
                       <ArrowRight className="size-4" />
                     </Link>
                   </div>
