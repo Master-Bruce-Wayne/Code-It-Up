@@ -62,7 +62,8 @@ const Register = () => {
           </p>
         </div>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4 relative z-10">
+        {/* autocomplete="on" + new-password prompts the browser to offer to save credentials */}
+        <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4 relative z-10" autoComplete="on">
           <div className="flex flex-col gap-1.5">
             <label className="text-xs font-mono font-bold text-ink uppercase">Username</label>
             <div className="relative">
@@ -71,6 +72,7 @@ const Register = () => {
               </span>
               <input
                 type="text"
+                autoComplete="username"
                 placeholder="Enter your username"
                 className="w-full pl-10 pr-4 py-3 bg-canvas border-2 border-ink/20 text-ink placeholder-ink/40 focus:outline-none focus:border-ink transition-colors font-mono text-sm"
                 {...register("username", { required: "Username is required" })}
@@ -91,6 +93,7 @@ const Register = () => {
               </span>
               <input
                 type="email"
+                autoComplete="email"
                 placeholder="Enter your email"
                 className="w-full pl-10 pr-4 py-3 bg-canvas border-2 border-ink/20 text-ink placeholder-ink/40 focus:outline-none focus:border-ink transition-colors font-mono text-sm"
                 {...register("email", { required: "Email is required" })}
@@ -111,6 +114,7 @@ const Register = () => {
               </span>
               <input
                 type={showPassword ? "text" : "password"}
+                autoComplete="new-password"
                 placeholder="Create password"
                 className="w-full pl-10 pr-10 py-3 bg-canvas border-2 border-ink/20 text-ink placeholder-ink/40 focus:outline-none focus:border-ink transition-colors font-mono text-sm"
                 {...register("password", { required: "Password is required" })}
@@ -138,6 +142,7 @@ const Register = () => {
               </span>
               <input
                 type={showPassword ? "text" : "password"}
+                autoComplete="new-password"
                 placeholder="Re-enter password"
                 className="w-full pl-10 pr-4 py-3 bg-canvas border-2 border-ink/20 text-ink placeholder-ink/40 focus:outline-none focus:border-ink transition-colors font-mono text-sm"
                 {...register("confirmPassword", {

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import axios from "axios";
 import { useAuth } from "../context/User.jsx";
@@ -7,13 +7,25 @@ import { toast } from "react-toastify";
 import { User, Lock, Eye, EyeOff, LogIn, ArrowRight } from "lucide-react";
 import AnnotationMarker from "../components/AnnotationMarker.jsx";
 
+const REMEMBER_ME_KEY = "rememberedUsername";
+
 const Login = () => {
   const { setUserData } = useAuth();
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-  
-  const { register, handleSubmit, formState: { errors } } = useForm();
+  const [rememberMe, setRememberMe] = useState(false);
+
+  const { register, handleSubmit, setValue, formState: { errors } } = useForm();
+
+  // On mount, pre-fill username if the user had checked "Remember me" before
+  useEffect(() => {
+    const savedUsername = localStorage.getItem(REMEMBER_ME_KEY);
+    if (savedUsername) {
+      setValue("username", savedUsername);
+      setRememberMe(true);
+    }
+  }, [setValue]);
 
   const onSubmit = async (data) => {
     const apiUrl = import.meta.env.VITE_API_BASE_URL;
@@ -26,6 +38,13 @@ const Login = () => {
       if (response.data.success === false) {
         toast.error("Login failed! Invalid credentials.");
         return;
+      }
+
+      // Save or clear the remembered username based on the checkbox
+      if (rememberMe) {
+        localStorage.setItem(REMEMBER_ME_KEY, data.username);
+      } else {
+        localStorage.removeItem(REMEMBER_ME_KEY);
       }
 
       const userInfo = {
@@ -55,7 +74,7 @@ const Login = () => {
         <AnnotationMarker top right />
         <AnnotationMarker bottom left />
         <AnnotationMarker bottom right />
-        
+
         <div className="text-center mb-8 relative z-10">
           <div className="size-12 bg-canvas border-2 border-ink flex items-center justify-center mx-auto mb-4 shadow-[2px_2px_0_0_#17181A]">
             <LogIn className="size-6 text-ink" />
@@ -68,7 +87,8 @@ const Login = () => {
           </p>
         </div>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-5 relative z-10">
+        {/* autocomplete="on" triggers the browser's built-in "Save Password?" prompt */}
+        <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-5 relative z-10" autoComplete="on">
           <div className="flex flex-col gap-1.5">
             <label className="text-xs font-mono font-bold text-ink uppercase">Username</label>
             <div className="relative">
@@ -77,6 +97,7 @@ const Login = () => {
               </span>
               <input
                 type="text"
+                autoComplete="username"
                 {...register("username", { required: "Username is required" })}
                 placeholder="Enter your username"
                 className="w-full pl-10 pr-4 py-3 bg-canvas border-2 border-ink/20 text-ink placeholder-ink/40 focus:outline-none focus:border-ink transition-colors font-mono text-sm"
@@ -97,6 +118,7 @@ const Login = () => {
               </span>
               <input
                 type={showPassword ? "text" : "password"}
+                autoComplete="current-password"
                 {...register("password", { required: "Password is required" })}
                 placeholder="Enter your password"
                 className="w-full pl-10 pr-10 py-3 bg-canvas border-2 border-ink/20 text-ink placeholder-ink/40 focus:outline-none focus:border-ink transition-colors font-mono text-sm"
@@ -114,6 +136,33 @@ const Login = () => {
                 {errors.password.message}
               </p>
             )}
+          </div>
+
+          {/* Remember Me */}
+          <div className="flex items-center gap-2.5">
+            <button
+              type="button"
+              role="checkbox"
+              aria-checked={rememberMe}
+              onClick={() => setRememberMe((prev) => !prev)}
+              className={`w-4 h-4 border-2 flex items-center justify-center transition-colors cursor-pointer flex-shrink-0 ${
+                rememberMe
+                  ? "bg-ink border-ink"
+                  : "bg-canvas border-ink/30 hover:border-ink"
+              }`}
+            >
+              {rememberMe && (
+                <svg className="w-2.5 h-2.5 text-canvas" fill="none" viewBox="0 0 10 10">
+                  <path d="M1.5 5l2.5 2.5 4.5-4.5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              )}
+            </button>
+            <span
+              className="text-xs font-mono text-ink/60 uppercase select-none cursor-pointer hover:text-ink transition-colors"
+              onClick={() => setRememberMe((prev) => !prev)}
+            >
+              Remember my username
+            </span>
           </div>
 
           <button
