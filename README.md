@@ -1,25 +1,76 @@
-# Code-It-Up ⚡
+<div align="center">
 
-> A high-performance competitive programming and algorithmic contest platform featuring in-browser code execution, an automated sandboxed judge engine, and real-time ICPC-style contest leaderboards.
+# ⚡ Code-It-Up
+
+**A Modern, High-Performance Competitive Programming & Algorithmic Contest Platform**
+
+[![React](https://img.shields.io/badge/React-19.2-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://react.dev/)
+[![Vite](https://img.shields.io/badge/Vite-7.2-646CFF?style=for-the-badge&logo=vite&logoColor=white)](https://vitejs.dev/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-v4-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
+[![Node.js](https://img.shields.io/badge/Node.js-18+-339933?style=for-the-badge&logo=node.js&logoColor=white)](https://nodejs.org/)
+[![Express](https://img.shields.io/badge/Express-5.x-000000?style=for-the-badge&logo=express&logoColor=white)](https://expressjs.com/)
+[![Supabase](https://img.shields.io/badge/Supabase-PostgreSQL-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white)](https://supabase.com/)
+[![C++](https://img.shields.io/badge/Judge-GCC_%2F_G%2B%2B-00599C?style=for-the-badge&logo=c%2B%2B&logoColor=white)](https://gcc.gnu.org/)
+[![License](https://img.shields.io/badge/License-ISC-blue?style=for-the-badge)](LICENSE)
+
+<br/>
+
+<p align="center">
+  <b>In-Browser Code Editor</b> • <b>Local Sandboxed Judge</b> • <b>Real-Time ICPC Standings</b> • <b>Retro-Brutalist Blueprint UI</b>
+</p>
+
+</div>
+
+---
+
+## 📖 Table of Contents
+
+- [Overview](#-overview)
+- [Key Features](#-key-features)
+- [System Architecture](#-system-architecture)
+  - [High-Level Architecture](#1-high-level-architecture)
+  - [Online Judge & Execution Pipeline](#2-online-judge--execution-pipeline)
+  - [Contest State Machine](#3-contest-state-machine)
+  - [ICPC Standings Aggregation Engine](#4-icpc-standings-aggregation-engine)
+  - [Relational Data Architecture](#5-relational-data-architecture)
+- [Design System & Aesthetics](#-design-system--aesthetics)
+- [Technology Stack](#-technology-stack)
+- [Local Development Setup](#-local-development-setup)
+- [Contributing & License](#-contributing--license)
 
 ---
 
 ## 📌 Overview
 
-**Code-It-Up** is a full-stack algorithmic challenge platform inspired by platforms like Codeforces and AtCoder, paired with a tactile, retro-brutalist "blueprint" visual design system. The system provides a complete workflow for competitive programmers and contest organizers: from problem browsing and real-time testcase execution to synchronized contest rounds and dynamic live standings.
+**Code-It-Up** is a full-featured competitive programming platform designed for problem setters, contest organizers, and competitive coders. Engineered with inspiration from industry standards such as Codeforces and AtCoder, the platform pairs an automated local judge engine with a tactile, technical **Blueprint / Retro-Brutalist** design aesthetic.
+
+Users can browse categorized algorithmic challenges, test solutions against custom testcases in an integrated Monaco code editor, compete in scheduled rounds with countdown synchronization, and track live standings calculated via international ICPC rules.
+
+---
+
+## 🚀 Key Features
+
+- **⚡ In-Browser Monaco Code Editor**: Syntax highlighting, auto-indentation, and multi-language foundations.
+- **🛡️ Sandboxed Online Judge**: Automatic compilation, process supervision with timeout monitoring, and batch testcase validation on native disk storage.
+- **⏱️ Contest Lifecycle Automation**: Three-stage progression (Upcoming, Live, Past) with automated problem release timers and problem locking.
+- **🏆 ICPC-Standard Standings**: Real-time rank calculation combining problem solves with minute-based penalties and wrong-attempt multipliers.
+- **🔄 Live Auto-Syncing**: 60-second polling intervals during active rounds plus on-demand manual sync for instant leaderboard refresh.
+- **🔒 Browser Credential Integration**: Native `autocomplete` attributes support browser password managers alongside persistent "Remember Me" credentials.
+- **🎯 Rated & Unrated Tracks**: Flexible participation enrollment allowing competitive users to track rating changes while casual participants upsolve without rating pressure.
+- **📊 Comprehensive Submission Auditing**: Transparent execution telemetry recording language, execution time, memory usage, and precise OS signal-level verdicts.
 
 ---
 
 ## 🏛️ System Architecture
 
-The platform follows a modular layered architecture dividing client interactions, service orchestration, local sandbox execution, and persistent cloud storage.
+The platform separates concerns across four distinct architectural tiers: the client presentation tier, the application routing & business logic tier, the local sandboxed judge tier, and the cloud relational data tier.
 
-### High-Level System Architecture Diagram
+### 1. High-Level Architecture
 
 ```mermaid
 graph TD
     subgraph ClientLayer["Frontend Client (React 19 + Vite)"]
-        UI["Blueprint UI & Monaco Code Editor"]
+        UI["Blueprint UI & Monaco Editor"]
         State["Auth Context & Router State"]
         Poller["Live Standings Poller & Timers"]
     end
@@ -35,7 +86,7 @@ graph TD
         Compiler["GNU C++ Compiler (g++)"]
         ProcessRunner["Process Execution & Limits Monitor"]
         TestVerifier["Testcase Batch Verifier"]
-        VerdictClassifier["Verdict Classifier (Signals & Exits)"]
+        VerdictClassifier["Verdict Classifier & Signals"]
     end
 
     subgraph DataLayer["Persistence Layer (Supabase / PostgreSQL)"]
@@ -45,150 +96,132 @@ graph TD
         SubmissionsDB[("Submissions Log")]
     end
 
-    UI -->|Interactive State & Action Dispatch| AuthSvc
-    UI -->|Contest Interaction| ContestSvc
-    UI -->|Run / Submit Solutions| JudgeSvc
-    Poller -->|Fetch Dynamic Leaderboard| StandingsEngine
+    UI -->|"State & Actions"| AuthSvc
+    UI -->|"Contest Actions"| ContestSvc
+    UI -->|"Submit Solution"| JudgeSvc
+    Poller -->|"Fetch Leaderboard"| StandingsEngine
 
-    AuthSvc <-->|User Records| UsersDB
-    ContestSvc <-->|Contests & Enrollment| ContestsDB
-    JudgeSvc <-->|Log Verdicts & Metadata| SubmissionsDB
-    JudgeSvc <-->|Fetch Limits & Problem Specs| ProblemsDB
-    StandingsEngine <-->|Read Registrations & Submissions| ContestsDB
-    StandingsEngine <-->|Read Submissions within Window| SubmissionsDB
+    AuthSvc <-->|"User Profiles"| UsersDB
+    ContestSvc <-->|"Contests & Enrollments"| ContestsDB
+    JudgeSvc <-->|"Verdicts & Metadata"| SubmissionsDB
+    JudgeSvc <-->|"Limits & Specs"| ProblemsDB
+    StandingsEngine <-->|"Registrations"| ContestsDB
+    StandingsEngine <-->|"Submissions in Window"| SubmissionsDB
 
-    JudgeSvc -->|Spawn Isolated Sandbox| Compiler
-    Compiler -->|Output Binary| ProcessRunner
-    ProcessRunner -->|Feed Inputs| TestVerifier
-    TestVerifier -->|Process Signals & Diff Output| VerdictClassifier
-    VerdictClassifier -->|Final Verdict (AC, WA, TLE, etc.)| JudgeSvc
+    JudgeSvc -->|"Spawn Isolated Sandbox"| Compiler
+    Compiler -->|"Output Executable"| ProcessRunner
+    ProcessRunner -->|"Feed Testcase Inputs"| TestVerifier
+    TestVerifier -->|"Signals & Output Diff"| VerdictClassifier
+    VerdictClassifier -->|"Return Verdict to Service"| JudgeSvc
 ```
 
 ---
 
-## ⚙️ Implemented Modules & Features
+### 2. Online Judge & Execution Pipeline
 
-### 1. User Identity & Authentication
-- **Secure Authentication:** Session handling backed by JSON Web Tokens and encrypted password hashing via bcrypt.
-- **Browser Credential Management:** Fully compliant standard credential metadata (`autocomplete` attributes) enabling native browser password manager save/update prompts.
-- **Persistent Remember Me:** Local storage persistence for remember-me credentials across sessions with automatic form pre-filling.
-
----
-
-### 2. Problemset & Algorithmic Repository
-- **Categorized Problem Catalog:** Searchable and filterable problem repository with difficulty rating badges and tags.
-- **Problem Statement Presentation:** Formatted problem views including input/output specifications, mathematical constraints, and sample testcases with copyable snippets.
-- **Resource Constraints:** Defined execution time limits (in milliseconds) and memory thresholds per challenge.
-
----
-
-### 3. Online Judge & Execution Engine
+When a user submits code, the submission pipeline creates an ephemeral directory, compiles the source code, and feeds inputs from disk into the running process while monitoring time limits and operating system signals.
 
 ```mermaid
 flowchart TD
-    Start["User Triggers Code Submission"] --> Validate["Validate Input, Language & Permissions"]
-    Validate --> TempDir["Generate Isolated UUID Working Directory"]
-    TempDir --> WriteSrc["Write Source File (main.cpp)"]
-    WriteSrc --> Compile["Invoke GNU C++ Compiler (g++)"]
+    Start["User Submits Code"] --> Validate["Validate Input & Language"]
+    Validate --> TempDir["Create UUID Working Directory"]
+    TempDir --> WriteSrc["Write Source File"]
+    WriteSrc --> Compile["Compile with g++"]
     
-    Compile -- "Compilation Error" --> RecordCE["Record Verdict: CE"]
-    Compile -- "Success" --> LoadTC["Load Problem Testcases (Input / Expected Output)"]
+    Compile -->|"Compilation Failed"| RecordCE["Record Verdict: CE"]
+    Compile -->|"Compilation Succeeded"| LoadTC["Load Problem Testcases"]
     
-    subgraph ExecutionLoop["Testcase Execution Loop"]
-        RunExec["Execute Binary with Stdin Stream & Timeout Monitor"]
-        RunExec -- "Timeout Exceeded" --> SigTLE["Kill Process -> Verdict: TLE"]
-        RunExec -- "Segmentation Fault (SIGSEGV)" --> SigRTE["Kill Process -> Verdict: RTE"]
-        RunExec -- "Floating Point Error (SIGFPE)" --> SigRTE
-        RunExec -- "Exit Non-Zero / Abort" --> SigRTE
-        RunExec -- "Successful Run" --> Compare["Diff Actual Output vs Expected Output"]
-        Compare -- "Mismatch" --> SigWA["Verdict: WA"]
-        Compare -- "Match & Next Testcase Exists" --> RunExec
-        Compare -- "All Testcases Match" --> SigAC["Verdict: AC"]
+    subgraph ExecutionLoop["Batch Testcase Verification"]
+        RunExec["Execute Binary with Stdin & Timeout Monitor"]
+        RunExec -->|"Timeout Exceeded"| SigTLE["Kill Process: TLE"]
+        RunExec -->|"Segmentation Fault"| SigRTE["Kill Process: RTE"]
+        RunExec -->|"Floating Point Error"| SigRTE
+        RunExec -->|"Non-Zero Exit"| SigRTE
+        RunExec -->|"Exit Code 0"| Compare["Diff Actual vs Expected Output"]
+        Compare -->|"Mismatch Found"| SigWA["Verdict: WA"]
+        Compare -->|"Match & Remaining Tests Exist"| RunExec
+        Compare -->|"All Testcases Match"| SigAC["Verdict: AC"]
     end
 
     LoadTC --> ExecutionLoop
-    RecordCE --> Cleanup["Purge Ephemeral Working Directory"]
+    RecordCE --> Cleanup["Purge Working Directory"]
     SigTLE --> Cleanup
     SigRTE --> Cleanup
     SigWA --> Cleanup
     SigAC --> Cleanup
-    Cleanup --> Persist["Persist Submission Details in Database"]
-    Persist --> Response["Return Execution Verdict & Metadata to Client"]
+    Cleanup --> Persist["Persist Submission in Database"]
+    Persist --> Response["Return Verdict & Metrics to Client"]
 ```
 
-- **Dual-Mode Execution:**
-  - **Run Mode:** Compiles and executes code against custom user-defined inputs without altering global submission stats.
-  - **Submit Mode:** Judges the solution against the full batch test suite on disk, assigning official verdicts.
-- **Precise Verdict Classifier:**
-  - `AC` (Accepted): Solution passes all testcases within the time limit.
-  - `WA` (Wrong Answer): Solution produces an output mismatch against canonical answers.
-  - `TLE` (Time Limit Exceeded): Process exceeds the execution window and is cleanly terminated.
-  - `CE` (Compilation Error): Compiler flags syntax errors or build issues.
-  - `RTE` (Runtime Error): Catches `SIGSEGV`, `SIGABRT`, `SIGFPE`, and non-zero exit codes.
+#### Verdict Classification Reference
+
+| Verdict | Meaning | Underlying Cause |
+|---|---|---|
+| **AC** | Accepted | Solution executed within time limit and output matched all canonical outputs byte-for-byte. |
+| **WA** | Wrong Answer | Solution terminated normally but produced incorrect output on one or more testcases. |
+| **TLE** | Time Limit Exceeded | Execution duration exceeded the problem's time limit threshold; process terminated by judge. |
+| **CE** | Compilation Error | The GNU C++ compiler emitted non-zero exit code due to syntax or linking errors. |
+| **RTE** | Runtime Error | Process terminated abnormally (`SIGSEGV` segmentation fault, `SIGFPE` arithmetic fault, `SIGABRT`). |
 
 ---
 
-### 4. Contest Organization & Lifecycle
+### 3. Contest State Machine
+
+Contest progression is governed by strict wall-clock time boundaries. The frontend and backend synchronize on UTC timestamps to manage registrations, problem visibility, and standings finalization.
 
 ```mermaid
 stateDiagram-v2
-    [*] --> Upcoming: Contest Scheduled
+    [*] --> Upcoming: Contest Created & Scheduled
     
     state Upcoming {
         [*] --> RegistrationOpen
-        RegistrationOpen --> RegisteredRated: Register (Rated)
-        RegistrationOpen --> RegisteredUnrated: Register (Unrated)
+        RegistrationOpen --> RegisteredRated: Register as Rated
+        RegistrationOpen --> RegisteredUnrated: Register as Unrated
         RegisteredRated --> CountdownActive
         RegisteredUnrated --> CountdownActive
     }
     
-    Upcoming --> Live: Clock Reaches Start Time (Problems Unlock)
+    Upcoming --> Live: Clock Hits Start Time (Problems Unlock)
     
     state Live {
         [*] --> SubmissionsOpen
-        SubmissionsOpen --> RealtimeStandings: Submissions Scored
+        SubmissionsOpen --> RealtimeStandings: Submissions Processed
         RealtimeStandings --> SubmissionsOpen: Auto-Poll Leaderboard (60s)
     }
     
-    Live --> Past: Clock Reaches (Start Time + Duration)
+    Live --> Past: Clock Hits Start Time + Duration
     
     state Past {
-        [*] --> FinalStandings: Official Results Frozen
-        FinalStandings --> ArchivePractice: Open for Post-Contest Upsolving
+        [*] --> FinalStandings: Official Results Finalized
+        FinalStandings --> ArchivePractice: Practice & Upsolving Active
     }
 ```
 
-- **Dynamic Lifecycle Management:** Contests transition through three states:
-  - **Upcoming:** Registration portal open; real-time countdown timer active; problems locked.
-  - **Live:** Instant problem release upon start time; submission processing enabled; live standings updating.
-  - **Past:** Official results archived; problems unlocked for ongoing practice and upsolving.
-- **Participation Modes:** Allows users to enroll with either **Rated** (alters rating calculations) or **Unrated** (casual practice) status.
-
 ---
 
-### 5. ICPC-Style Standings & Leaderboard System
+### 4. ICPC Standings Aggregation Engine
 
-The standings module calculates contest rankings following the international ICPC standard.
+The standings service processes all activity within the contest window, enforcing fair competition rules:
 
 ```mermaid
-graph LR
+flowchart LR
     subgraph InputData["Contest Data"]
-        Registrations["Contest Registrations (Rated & Unrated)"]
-        TimeBounds["Contest Time Window [T_start, T_end]"]
-        Submissions["Contest Problem Submissions"]
+        Registrations["Contest Registrations"]
+        TimeBounds["Contest Window: T_start to T_end"]
+        Submissions["Contest Submissions"]
     end
 
-    subgraph EvaluationPipeline["Standings Aggregation Pipeline"]
-        Filter["Window Filter (Discard Submissions Outside Contest)"]
-        UserGroup["Group Submissions by Participant"]
-        ProblemEval["Problem Evaluation: First AC Detection & Pre-AC Wrong Attempts"]
-        ScoreCalc["Calculate Solved Count & Penalty: T_solve + 20 × WrongAttempts"]
-        SortRanks["Sort: Solved (Descending) -> Penalty (Ascending)"]
-        AssignRanks["Assign Ranks with Duplicate-Score Tie Resolution"]
+    subgraph EvaluationPipeline["Standings Engine"]
+        Filter["Filter Submissions to Contest Window"]
+        UserGroup["Group Submissions by Registered User"]
+        ProblemEval["Detect First AC & Count Pre-AC Wrongs"]
+        ScoreCalc["Calculate Penalty: Time + 20m x Wrongs"]
+        SortRanks["Sort: Solved Descending, Penalty Ascending"]
+        AssignRanks["Assign Ranks with Duplicate-Score Ties"]
     end
 
-    subgraph OutputView["Leaderboard Interface"]
-        Table["Interactive Standings Table with Gold/Silver/Bronze Medals"]
+    subgraph OutputView["Leaderboard"]
+        Table["Render Standings Table & Podium Medals"]
     end
 
     InputData --> Filter
@@ -200,20 +233,19 @@ graph LR
     AssignRanks --> OutputView
 ```
 
-- **Scoring Formula:**
-  $$\text{Problem Penalty} = \text{Solve Time (minutes)} + (20 \times \text{Wrong Submissions Before First AC})$$
-  $$\text{Total Penalty} = \sum_{\text{Solved Problems}} \text{Problem Penalty}$$
-- **Key Standings Capabilities:**
-  - **Registration-Bound Participant Display:** All registered contenders appear, including those with zero solves.
-  - **Live Standings Polling:** Background auto-refresh polling every 60 seconds during live rounds, supplemented with an instant manual sync trigger.
-  - **Visual Distinction:** Highlights the authenticated user's row (`YOU` indicator), marks unrated participants, and renders gold, silver, and bronze podium badges.
-  - **Contextual Problem Links:** Header column indicators link directly to problem statements for quick navigation.
+$$\text{Problem Penalty} = \text{Solve Time (minutes from start)} + (20 \times \text{Wrong Submissions Before First AC})$$
+
+$$\text{Total Contest Penalty} = \sum_{p \in \text{Solved Problems}} \text{Penalty}(p)$$
+
+- **Registration Gate:** Only registered contestants appear in the official leaderboard; users with zero solves remain listed.
+- **Time Boundary Enforcement:** Submissions before the official start or after the contest duration expires are ignored in the calculation.
+- **Tie Resolution:** Participants with identical solve counts and identical penalties share the same rank.
 
 ---
 
-### 6. Relational Data Architecture
+### 5. Relational Data Architecture
 
-The persistence model establishes clear relational boundaries between users, problems, contest fixtures, and execution history.
+The underlying PostgreSQL database hosted on Supabase enforces referential integrity across the contest platform:
 
 ```mermaid
 erDiagram
@@ -288,80 +320,82 @@ erDiagram
 
 ---
 
-## 🎨 Visual Identity & Design System
+## 🎨 Design System & Aesthetics
 
-The frontend implements a custom **Blueprint / Tactical Brutalist** design philosophy:
-- **Canvas Palette:** Warm, tactile cream background (`#EDE8DC`) paired with off-white panel surfaces (`#FAF7F0`).
-- **Border Treatment:** Confident `2px solid #17181A` ink borders across components, buttons, and input fields.
-- **Graphic Accents:** Technical grid textures, annotation markers with connector lines, and accent colors (Lime `#E7F0A0` for success/active states, Coral `#F3A79A` for errors/unsolved states).
-- **Typography:** Blocky monospace typeface (`Space Mono` / `JetBrains Mono`) for metrics, titles, and terminal data, balanced by clean grotesque sans-serif for body descriptions.
+Code-It-Up adopts an intentional **Technical Blueprint & Retro-Brutalist** visual system:
+
+- **Warm Paper Canvas**: `#EDE8DC` background paired with `#FAF7F0` card surfaces, evoking an annotated engineering drawing.
+- **Architectural Borders**: Confident `2px solid #17181A` ink strokes on all interactive cards, inputs, and tables with zero blurry drop shadows.
+- **Hard-Offset Accents**: Hard-offset solid blocks (`4px 4px 0px 0px #17181A`) provide tactile depth on button clicks and hover states.
+- **Technical Typography**: Monospace fonts (`Space Mono`, `JetBrains Mono`) dominate data headers, stats, code snippets, and button actions, supported by clean sans-serif for reading comfort.
+- **Annotation Markers**: Grid intersection anchors and connector lines signify live metrics and layout sections.
 
 ---
 
 ## 🛠️ Technology Stack
 
-| Layer | Technologies |
-|---|---|
-| **Frontend Framework** | React 19, Vite, React Router v7 |
-| **Styling & Icons** | Tailwind CSS v4, Lucide React, Custom Blueprint Tokens |
-| **Code Editor** | Monaco Editor (`@monaco-editor/react`) |
-| **Backend Runtime** | Node.js, Express (ES Modules) |
-| **Language Sandboxing** | Child process execution, GCC/G++ Toolchain |
-| **Database & Auth** | Supabase (PostgreSQL), JWT, bcrypt |
-| **Form Management** | React Hook Form, React Toastify |
+| Layer | Technology | Purpose |
+|---|---|---|
+| **Frontend Core** | React 19, Vite | Single-page application rendering with optimized module bundling. |
+| **Routing** | React Router DOM v7 | Dynamic client-side routing and tab coordination. |
+| **Styling** | Tailwind CSS v4, Lucide React | Utility-first styling with custom blueprint color tokens and iconography. |
+| **Editor** | Monaco Editor | In-browser C++ code authoring environment. |
+| **Backend Core** | Node.js, Express (ESM) | Non-blocking API server and process coordinator. |
+| **Compiler & Judge** | GCC / G++ (C++20) | Native machine code compilation and sandboxed execution. |
+| **Database** | Supabase (PostgreSQL) | Relational database with ACID transactions and schema integrity. |
+| **Auth & Security** | JWT, bcrypt, Cookie Parser | Stateless token issuance with secure cookie storage. |
 
 ---
 
 ## 🚀 Local Development Setup
 
 ### Prerequisites
-- **Node.js** (v18 or higher)
-- **C++ Compiler** (`g++`) accessible in your system's PATH
-- **Supabase Project** with relational schema migrations applied
+- **Node.js** (v18.0.0 or later)
+- **C++ Compiler** (`g++`) installed and added to your system environment variables (`PATH`)
+- **Git**
 
-### 1. Repository Setup
+### 1. Clone the Repository
 ```bash
 git clone https://github.com/Master-Bruce-Wayne/Code-It-Up.git
 cd Code-It-Up
 ```
 
-### 2. Backend Configuration
-Create an environment file inside the `backend/` directory:
+### 2. Configure & Run Backend
 ```bash
 cd backend
 npm install
 ```
-Configure environment variables:
-- `PORT`: Server port
-- `FRONTEND_URL`: Client application host origin for CORS validation
-- `JWT_SECRET`: Secret key for session token signing
-- `SUPABASE_URL`: Supabase project URL
-- `SUPABASE_ANON_KEY` / `SUPABASE_SERVICE_ROLE_KEY`: Supabase API credentials
-
-Start the backend service:
+Configure your environment variables in `backend/.env`:
+```env
+PORT=3000
+FRONTEND_URL=http://localhost:5173
+JWT_SECRET=your_jwt_secret_key
+SUPABASE_URL=your_supabase_project_url
+SUPABASE_ANON_KEY=your_supabase_anon_key
+SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key
+```
+Launch the backend server:
 ```bash
 npm run dev
 ```
 
-### 3. Frontend Configuration
-In a separate terminal:
+### 3. Configure & Run Frontend
+In a new terminal window:
 ```bash
 cd frontend
 npm install
 ```
-Configure environment variables:
-- `VITE_API_BASE_URL`: Base URL where the backend application server is hosted
-
-Start the development server:
+Configure your client environment in `frontend/.env`:
+```env
+VITE_API_BASE_URL=http://localhost:3000/api/v1
+```
+Start the frontend development server:
 ```bash
 npm run dev
-```
-Build for production:
-```bash
-npm run build
 ```
 
 ---
 
 ## 📄 License
-This project is licensed under the ISC License.
+
+This project is licensed under the **ISC License**.
