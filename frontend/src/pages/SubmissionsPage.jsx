@@ -2,7 +2,9 @@ import React, { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '../context/User';
 import { toast } from 'react-toastify';
+import { Sparkles } from 'lucide-react';
 import AnnotationMarker from '../components/AnnotationMarker.jsx';
+import AiAnalysisModal from '../components/AiAnalysisModal.jsx';
 
 const SubmissionsPage = () => {
     const [loading, setLoading] = useState(true);
@@ -11,6 +13,13 @@ const SubmissionsPage = () => {
     const { probCode, contestCode } = useParams();
     const { userData, setUserData } = useAuth();
     const navigate = useNavigate();
+
+    // AI Analysis Modal States
+    const [selectedSub, setSelectedSub] = useState(null);
+    const [aiModalOpen, setAiModalOpen] = useState(false);
+    const [aiLoading, setAiLoading] = useState(false);
+    const [aiAnalysis, setAiAnalysis] = useState(null);
+    const [aiError, setAiError] = useState(null);
 
     const apiUrl = import.meta.env.VITE_API_BASE_URL;
 
@@ -66,6 +75,40 @@ const SubmissionsPage = () => {
 
         fetchSubmissions();
     }, [userData, probCode, contestCode]);
+
+    const handleAnalyzeSubmission = async (s) => {
+        setSelectedSub(s);
+        setAiModalOpen(true);
+        setAiLoading(true);
+        setAiError(null);
+        setAiAnalysis(null);
+
+        try {
+            const res = await fetch(`${apiUrl}/submission/analyze`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    code: s.code,
+                    language: s.language || "cpp",
+                    probCode: s.problemCode || s.probCode,
+                    verdict: s.verdict,
+                    timeTaken: s.timeTaken,
+                    memoryUsed: s.memoryUsed
+                })
+            });
+
+            const data = await res.json();
+            if (data.success && data.analysis) {
+                setAiAnalysis(data.analysis);
+            } else {
+                setAiError(data.message || "Failed to analyze code with Gemini.");
+            }
+        } catch (err) {
+            setAiError(err.message || "Connection error while reaching Gemini API.");
+        } finally {
+            setAiLoading(false);
+        }
+    };
 
     const getVerdictBadge = (v) => {
         const baseClasses = "inline-flex items-center justify-center px-3 py-1 rounded-pill text-[10px] font-mono font-bold uppercase tracking-wider border-2 border-ink";
@@ -167,7 +210,8 @@ const SubmissionsPage = () => {
                                     <th className="p-4 font-mono font-bold text-[10px] uppercase tracking-wider text-ink text-left border-r-2 border-ink/20">Problem</th>
                                     <th className="p-4 font-mono font-bold text-[10px] uppercase tracking-wider text-ink text-center border-r-2 border-ink/20">Language</th>
                                     <th className="p-4 font-mono font-bold text-[10px] uppercase tracking-wider text-ink text-center border-r-2 border-ink/20">Verdict</th>
-                                    <th className="p-4 font-mono font-bold text-[10px] uppercase tracking-wider text-ink text-center">Submitted At</th>
+                                    <th className="p-4 font-mono font-bold text-[10px] uppercase tracking-wider text-ink text-center border-r-2 border-ink/20">Submitted At</th>
+                                    <th className="p-4 font-mono font-bold text-[10px] uppercase tracking-wider text-ink text-center">AI Insights</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -192,8 +236,19 @@ const SubmissionsPage = () => {
                                             {getVerdictBadge(s.verdict)}
                                         </td>
 
-                                        <td className="p-4 text-ink-muted font-mono text-[10px] font-bold uppercase tracking-wider text-center">
+                                        <td className="p-4 text-ink-muted font-mono text-[10px] font-bold uppercase tracking-wider text-center border-r-2 border-ink/20">
                                             {new Date(s.createdAt).toLocaleString()}
+                                        </td>
+
+                                        <td className="p-4 text-center">
+                                            <button
+                                                onClick={() => handleAnalyzeSubmission(s)}
+                                                className="inline-flex items-center gap-1.5 px-3 py-1.5 border-2 border-ink bg-surface hover:bg-lime text-ink font-mono font-bold text-[11px] uppercase tracking-wider rounded transition-colors shadow-[2px_2px_0_0_#17181A] hover:shadow-none hover:translate-x-[1px] hover:translate-y-[1px] cursor-pointer"
+                                                title="Analyze solution & get optimization suggestions with Gemini AI"
+                                            >
+                                                <Sparkles className="size-3.5 text-ink" />
+                                                Analyze
+                                            </button>
                                         </td>
                                     </tr>
                                 ))}
@@ -202,6 +257,17 @@ const SubmissionsPage = () => {
                     </div>
                 </div>
             )}
+
+            {/* Gemini AI Analysis Modal */}
+            <AiAnalysisModal
+                isOpen={aiModalOpen}
+                onClose={() => setAiModalOpen(false)}
+                loading={aiLoading}
+                analysis={aiAnalysis}
+                error={aiError}
+                problemCode={selectedSub ? (selectedSub.problemCode || selectedSub.probCode) : ""}
+                verdict={selectedSub ? selectedSub.verdict : null}
+            />
         </div>
     );
 };
