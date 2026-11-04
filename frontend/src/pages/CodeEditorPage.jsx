@@ -4,7 +4,8 @@ import { useNavigate, useParams, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/User.jsx';
 import Editor from "@monaco-editor/react";
 import { toast } from 'react-toastify';
-import { Play, Send, RefreshCw } from 'lucide-react';
+import { Play, Send, RefreshCw, Sparkles } from 'lucide-react';
+import AiAnalysisModal from '../components/AiAnalysisModal.jsx';
 
 const CodeEditorPage = () => {
     const apiUrl = import.meta.env.VITE_API_BASE_URL;
@@ -24,6 +25,12 @@ const CodeEditorPage = () => {
     const [consoleOutput, setConsoleOutput] = useState('');
     const [consoleVerdict, setConsoleVerdict] = useState('');
     const [hasRun, setHasRun] = useState(false);
+
+    // AI Analysis Modal states
+    const [aiModalOpen, setAiModalOpen] = useState(false);
+    const [aiLoading, setAiLoading] = useState(false);
+    const [aiAnalysis, setAiAnalysis] = useState(null);
+    const [aiError, setAiError] = useState(null);
 
     const handleRunCode = async () => {
         try {
@@ -85,6 +92,32 @@ const CodeEditorPage = () => {
             toast.error(err.message);
         } finally {
             setLoading(false);
+        }
+    };
+
+    const handleAiAnalysis = async () => {
+        setAiModalOpen(true);
+        setAiLoading(true);
+        setAiError(null);
+        setAiAnalysis(null);
+
+        try {
+            const res = await axios.post(`${apiUrl}/submission/analyze`, {
+                code,
+                language,
+                probCode,
+                verdict: hasRun ? consoleVerdict : null
+            });
+
+            if (res.data.success && res.data.analysis) {
+                setAiAnalysis(res.data.analysis);
+            } else {
+                setAiError(res.data.message || "Failed to analyze code with Gemini.");
+            }
+        } catch (err) {
+            setAiError(err.response?.data?.message || err.message || "Connection error reaching Gemini API.");
+        } finally {
+            setAiLoading(false);
         }
     };
 
@@ -224,26 +257,54 @@ const CodeEditorPage = () => {
                 </div>
 
                 {/* Action Buttons */}
-                <div className="flex justify-end gap-4 pt-4 border-t-2 border-ink">
+                <div className="flex flex-wrap items-center justify-between gap-4 pt-4 border-t-2 border-ink">
                     <button
-                        onClick={handleRunCode}
-                        disabled={running || loading}
-                        className="flex items-center gap-1.5 bg-surface hover:bg-canvas-alt text-ink px-6 py-2.5 rounded-md font-mono font-bold text-sm uppercase tracking-wide border-2 border-ink disabled:opacity-50 transition-transform active:translate-y-[1px] cursor-pointer"
+                        onClick={handleAiAnalysis}
+                        disabled={loading || running}
+                        className="flex items-center gap-1.5 bg-surface hover:bg-lime text-ink px-4 py-2.5 rounded-md font-mono font-bold text-sm uppercase tracking-wide border-2 border-ink shadow-[2px_2px_0_0_#17181A] hover:shadow-none hover:translate-x-[1px] hover:translate-y-[1px] disabled:opacity-50 transition-all cursor-pointer"
+                        title="Analyze current solution & get algorithmic optimization tips with Gemini"
                     >
-                        <Play className="size-4" />
-                        {running ? "Running..." : "Run Code"}
+                        <Sparkles className="size-4 text-ink" />
+                        AI Analysis
                     </button>
 
-                    <button
-                        onClick={handleSubmit}
-                        disabled={loading || running}
-                        className="flex items-center gap-1.5 bg-lime hover:bg-lime-hover text-ink px-8 py-2.5 rounded-md font-mono font-bold text-sm uppercase tracking-wide border-2 border-ink shadow-[4px_4px_0_0_#17181A] hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-50 transition-all cursor-pointer"
-                    >
-                        <Send className="size-4" />
-                        {loading ? "Submitting..." : "Submit"}
-                    </button>
+                    <div className="flex items-center gap-4">
+                        <button
+                            onClick={handleRunCode}
+                            disabled={running || loading}
+                            className="flex items-center gap-1.5 bg-surface hover:bg-canvas-alt text-ink px-6 py-2.5 rounded-md font-mono font-bold text-sm uppercase tracking-wide border-2 border-ink disabled:opacity-50 transition-transform active:translate-y-[1px] cursor-pointer"
+                        >
+                            <Play className="size-4" />
+                            {running ? "Running..." : "Run Code"}
+                        </button>
+
+                        <button
+                            onClick={handleSubmit}
+                            disabled={loading || running}
+                            className="flex items-center gap-1.5 bg-lime hover:bg-lime-hover text-ink px-8 py-2.5 rounded-md font-mono font-bold text-sm uppercase tracking-wide border-2 border-ink shadow-[4px_4px_0_0_#17181A] hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-50 transition-all cursor-pointer"
+                        >
+                            <Send className="size-4" />
+                            {loading ? "Submitting..." : "Submit"}
+                        </button>
+                    </div>
                 </div>
             </div>
+
+            {/* Gemini AI Analysis Modal */}
+            <AiAnalysisModal
+                isOpen={aiModalOpen}
+                onClose={() => setAiModalOpen(false)}
+                loading={aiLoading}
+                analysis={aiAnalysis}
+                error={aiError}
+                problemCode={probCode}
+                verdict={hasRun ? consoleVerdict : null}
+                onApplyCode={(suggestedCode) => {
+                    setCode(suggestedCode);
+                    setAiModalOpen(false);
+                    toast.success("Optimized code applied to editor!");
+                }}
+            />
         </div>
     );
 };

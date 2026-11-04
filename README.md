@@ -10,13 +10,14 @@
 [![Node.js](https://img.shields.io/badge/Node.js-18+-339933?style=for-the-badge&logo=node.js&logoColor=white)](https://nodejs.org/)
 [![Express](https://img.shields.io/badge/Express-5.x-000000?style=for-the-badge&logo=express&logoColor=white)](https://expressjs.com/)
 [![Supabase](https://img.shields.io/badge/Supabase-PostgreSQL-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white)](https://supabase.com/)
+[![Gemini](https://img.shields.io/badge/AI-Google_Gemini-8E75B2?style=for-the-badge&logo=googlegemini&logoColor=white)](https://ai.google.dev/)
 [![C++](https://img.shields.io/badge/Judge-GCC_%2F_G%2B%2B-00599C?style=for-the-badge&logo=c%2B%2B&logoColor=white)](https://gcc.gnu.org/)
 [![License](https://img.shields.io/badge/License-ISC-blue?style=for-the-badge)](LICENSE)
 
 <br/>
 
 <p align="center">
-  <b>In-Browser Code Editor</b> • <b>Local Sandboxed Judge</b> • <b>Real-Time ICPC Standings</b> • <b>Retro-Brutalist Blueprint UI</b>
+  <b>In-Browser Code Editor</b> • <b>Local Sandboxed Judge</b> • <b>Real-Time ICPC Standings</b> • <b>AI Code Analysis (Gemini)</b> • <b>Retro-Brutalist Blueprint UI</b>
 </p>
 
 </div>
@@ -30,9 +31,10 @@
 - [System Architecture](#-system-architecture)
   - [High-Level Architecture](#1-high-level-architecture)
   - [Online Judge & Execution Pipeline](#2-online-judge--execution-pipeline)
-  - [Contest State Machine](#3-contest-state-machine)
-  - [ICPC Standings Aggregation Engine](#4-icpc-standings-aggregation-engine)
-  - [Relational Data Architecture](#5-relational-data-architecture)
+  - [AI Code Analysis & Optimization Pipeline (Gemini)](#3-ai-code-analysis--optimization-pipeline-gemini)
+  - [Contest State Machine](#4-contest-state-machine)
+  - [ICPC Standings Aggregation Engine](#5-icpc-standings-aggregation-engine)
+  - [Relational Data Architecture](#6-relational-data-architecture)
 - [Design System & Aesthetics](#-design-system--aesthetics)
 - [Technology Stack](#-technology-stack)
 - [Local Development Setup](#-local-development-setup)
@@ -42,15 +44,16 @@
 
 ## 📌 Overview
 
-**Code-It-Up** is a full-featured competitive programming platform designed for problem setters, contest organizers, and competitive coders. Engineered with inspiration from industry standards such as Codeforces and AtCoder, the platform pairs an automated local judge engine with a tactile, technical **Blueprint / Retro-Brutalist** design aesthetic.
+**Code-It-Up** is a full-featured competitive programming platform designed for problem setters, contest organizers, and competitive coders. Engineered with inspiration from industry standards such as Codeforces and AtCoder, the platform pairs an automated local judge engine with a tactile, technical **Blueprint / Retro-Brutalist** design aesthetic and Google Gemini AI assistance.
 
-Users can browse categorized algorithmic challenges, test solutions against custom testcases in an integrated Monaco code editor, compete in scheduled rounds with countdown synchronization, and track live standings calculated via international ICPC rules.
+Users can browse categorized algorithmic challenges, test solutions against custom testcases in an integrated Monaco code editor, analyze code with AI for time complexity and algorithmic optimization, compete in scheduled rounds with countdown synchronization, and track live standings calculated via international ICPC rules.
 
 ---
 
 ## 🚀 Key Features
 
 - **⚡ In-Browser Monaco Code Editor**: Syntax highlighting, auto-indentation, and multi-language foundations.
+- **🤖 AI-Driven Code Analysis & Optimization**: Integrated Google Gemini API delivers structured verdict diagnosis, time & space asymptotic evaluation, edge-case warning checklists, and fully commented optimal code.
 - **🛡️ Sandboxed Online Judge**: Automatic compilation, process supervision with timeout monitoring, and batch testcase validation on native disk storage.
 - **⏱️ Contest Lifecycle Automation**: Three-stage progression (Upcoming, Live, Past) with automated problem release timers and problem locking.
 - **🏆 ICPC-Standard Standings**: Real-time rank calculation combining problem solves with minute-based penalties and wrong-attempt multipliers.
@@ -63,7 +66,7 @@ Users can browse categorized algorithmic challenges, test solutions against cust
 
 ## 🏛️ System Architecture
 
-The platform separates concerns across four distinct architectural tiers: the client presentation tier, the application routing & business logic tier, the local sandboxed judge tier, and the cloud relational data tier.
+The platform separates concerns across four distinct architectural tiers: the client presentation tier, the application routing & business logic tier, the local sandboxed judge tier, and the cloud relational & AI intelligence tier.
 
 ### 1. High-Level Architecture
 
@@ -73,6 +76,7 @@ graph TD
         UI["Blueprint UI & Monaco Editor"]
         State["Auth Context & Router State"]
         Poller["Live Standings Poller & Timers"]
+        AiModal["AI Analysis & Optimization Modal"]
     end
 
     subgraph ServiceLayer["Application Server (Node.js / Express)"]
@@ -80,6 +84,11 @@ graph TD
         ContestSvc["Contest & Registration Orchestrator"]
         JudgeSvc["Code Execution & Submission Pipeline"]
         StandingsEngine["ICPC Standings Aggregation Engine"]
+        AiEngine["Gemini Code Optimization Service"]
+    end
+
+    subgraph ExternalAI["Intelligence Tier"]
+        GeminiAPI[("Google Gemini 2.5 / 3 API")]
     end
 
     subgraph SandboxLayer["Execution Sandbox (Local Environment)"]
@@ -99,12 +108,17 @@ graph TD
     UI -->|"State & Actions"| AuthSvc
     UI -->|"Contest Actions"| ContestSvc
     UI -->|"Submit Solution"| JudgeSvc
+    UI -->|"Trigger AI Evaluation"| AiEngine
     Poller -->|"Fetch Leaderboard"| StandingsEngine
+
+    AiEngine <-->|"Structured Prompt & JSON Schema"| GeminiAPI
 
     AuthSvc <-->|"User Profiles"| UsersDB
     ContestSvc <-->|"Contests & Enrollments"| ContestsDB
     JudgeSvc <-->|"Verdicts & Metadata"| SubmissionsDB
     JudgeSvc <-->|"Limits & Specs"| ProblemsDB
+    AiEngine <-->|"Fetch Problem Specs & Submission"| ProblemsDB
+    AiEngine <-->|"Fetch Submission Context"| SubmissionsDB
     StandingsEngine <-->|"Registrations"| ContestsDB
     StandingsEngine <-->|"Submissions in Window"| SubmissionsDB
 
@@ -165,7 +179,32 @@ flowchart TD
 
 ---
 
-### 3. Contest State Machine
+### 3. AI Code Analysis & Optimization Pipeline (Gemini)
+
+The AI engine analyzes submitted solutions and code snippets using Google's Gemini models through `@google/genai` structured outputs, providing deterministic, parseable algorithmic feedback:
+
+```mermaid
+flowchart TD
+    Trigger["User Triggers AI Analysis (Editor / Submission Log)"] --> Assemble["Assemble Context: Code + Problem Spec + Verdict + Limits"]
+    Assemble --> SchemaPrompt["Construct Structured Prompt with Target JSON Schema"]
+    SchemaPrompt --> GeminiCall["Dispatch to Gemini API (gemini-2.5-flash / gemini-3)"]
+    
+    subgraph OutputSynthesis["Structured Intelligence Output"]
+        Summary["Executive Summary & Correctness Review"]
+        Diagnosis["Verdict Diagnosis (Root Cause for WA, TLE, CE, RTE)"]
+        Complexity["Asymptotic Comparison (Current vs Target Optimal)"]
+        Pitfalls["Edge Case & Overflow Warning Checklist"]
+        Optimizations["Actionable Algorithmic Techniques"]
+        CanonicalCode["Commented Optimal Implementation"]
+    end
+
+    GeminiCall --> OutputSynthesis
+    OutputSynthesis --> RenderModal["Present in Blueprint Tactical Modal with 1-Click Code Insert"]
+```
+
+---
+
+### 4. Contest State Machine
 
 Contest progression is governed by strict wall-clock time boundaries. The frontend and backend synchronize on UTC timestamps to manage registrations, problem visibility, and standings finalization.
 
@@ -199,7 +238,7 @@ stateDiagram-v2
 
 ---
 
-### 4. ICPC Standings Aggregation Engine
+### 5. ICPC Standings Aggregation Engine
 
 The standings service processes all activity within the contest window, enforcing fair competition rules:
 
@@ -243,7 +282,7 @@ $$\text{Total Contest Penalty} = \sum_{p \in \text{Solved Problems}} \text{Penal
 
 ---
 
-### 5. Relational Data Architecture
+### 6. Relational Data Architecture
 
 The underlying PostgreSQL database hosted on Supabase enforces referential integrity across the contest platform:
 
@@ -340,6 +379,7 @@ Code-It-Up adopts an intentional **Technical Blueprint & Retro-Brutalist** visua
 | **Routing** | React Router DOM v7 | Dynamic client-side routing and tab coordination. |
 | **Styling** | Tailwind CSS v4, Lucide React | Utility-first styling with custom blueprint color tokens and iconography. |
 | **Editor** | Monaco Editor | In-browser C++ code authoring environment. |
+| **AI Integration** | Google GenAI SDK (`@google/genai`) | Code complexity evaluation, root-cause diagnosis & optimization suggestions. |
 | **Backend Core** | Node.js, Express (ESM) | Non-blocking API server and process coordinator. |
 | **Compiler & Judge** | GCC / G++ (C++20) | Native machine code compilation and sandboxed execution. |
 | **Database** | Supabase (PostgreSQL) | Relational database with ACID transactions and schema integrity. |
@@ -369,10 +409,14 @@ Configure your environment variables in `backend/.env`:
 ```env
 PORT=3000
 FRONTEND_URL=http://localhost:5173
-JWT_SECRET=your_jwt_secret_key
+JWT_SECRET_KEY=your_jwt_secret_key
 SUPABASE_URL=your_supabase_project_url
 SUPABASE_ANON_KEY=your_supabase_anon_key
 SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key
+
+# Gemini AI API Configuration
+GEMINI_API_KEY=your_gemini_api_key
+GEMINI_MODEL=gemini-2.5-flash
 ```
 Launch the backend server:
 ```bash
