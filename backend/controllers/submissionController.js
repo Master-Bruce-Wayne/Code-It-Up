@@ -1,3 +1,4 @@
+import { generateCodeAnalysis } from "../config/gemini.js";
 import fs from "fs";
 import path from "path";
 import { exec } from "child_process";
@@ -491,3 +492,98 @@ export const getUserContestSubmissions = async(req,res) => {
         return res.status(400).json({ success:false, message:err.message})
     }
 }
+
+// AI Code Analysis (Gemini API)
+export const analyzeSubmission = async (req, res) => {
+    try {
+        const { code, language = "cpp", probCode, problemCode, verdict, timeTaken, memoryUsed } = req.body;
+
+        if (!code) {
+            return res.status(400).json({ success: false, message: "Source code is required for analysis." });
+        }
+
+        const targetCode = probCode || problemCode;
+        let problemName = "";
+        let problemDescription = "";
+
+        if (targetCode) {
+            const { data: problem } = await supabase
+                .from('problems')
+                .select('prob_name, prob_desc')
+                .eq('prob_code', targetCode)
+                .maybeSingle();
+
+            if (problem) {
+                problemName = problem.prob_name || "";
+                problemDescription = problem.prob_desc || "";
+            }
+        }
+
+        const analysis = await generateCodeAnalysis({
+            code,
+            language,
+            problemName,
+            problemCode: targetCode,
+            problemDescription,
+            verdict,
+            timeTaken,
+            memoryUsed
+        });
+
+        return res.status(200).json({
+            success: true,
+            analysis
+        });
+    } catch (err) {
+        console.error("AI Analysis Error:", err);
+        return res.status(500).json({
+            success: false,
+            message: err.message || "Failed to analyze code with Gemini API."
+        });
+    }
+};
+
+export const analyzeSubmissionById = async (req, res) => {
+    try {
+        const { submissionId } = req.params;
+
+        if (!submissionId) {
+            return res.status(400).json({ success: false, message: "Submission ID is required." });
+        }
+
+        const { data: s, error } = await supabase
+            .from('submissions')
+            .select('*, problems(prob_name, prob_code, prob_desc)')
+            .eq('id', submissionId)
+            .maybeSingle();
+
+        if (error || !s) {
+            return res.status(404).json({ success: false, message: "Submission not found." });
+        }
+
+        const analysis = await generateCodeAnalysis({
+            code: s.code,
+            language: s.language || "cpp",
+            problemName: s.problems?.prob_name || "",
+            problemCode: s.problem_code || s.problems?.prob_code || "",
+            problemDescription: s.problems?.prob_desc || "",
+            verdict: s.verdict,
+            timeTaken: s.time_taken,
+            memoryUsed: s.memory_used
+        });
+
+        return res.status(200).json({
+            success: true,
+            submissionId: s.id,
+            verdict: s.verdict,
+            problemCode: s.problem_code,
+            analysis
+        });
+    } catch (err) {
+        console.error("AI Analysis by ID Error:", err);
+        return res.status(500).json({
+            success: false,
+            message: err.message || "Failed to analyze submission with Gemini API."
+        });
+    }
+};
