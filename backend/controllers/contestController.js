@@ -302,7 +302,7 @@ export const getContestStandings = async (req, res) => {
         // 1. Fetch contest metadata + its problem list
         const { data: contest, error: contestError } = await supabase
             .from('contests')
-            .select('id, start_time, duration, contest_problems(problem_id, index_code)')
+            .select('id, contest_name, start_time, duration, contest_problems(problem_id, index_code)')
             .eq('contest_code', contestCode)
             .maybeSingle();
 
@@ -329,7 +329,16 @@ export const getContestStandings = async (req, res) => {
         }
 
         if (!registrations || registrations.length === 0) {
-            return res.status(200).json({ success: true, standings: [], problemIndices });
+            return res.status(200).json({
+                success: true,
+                contestName: contest.contest_name,
+                contestCode,
+                duration: contest.duration,
+                problemIndices,
+                contestStart: contestStart.toISOString(),
+                contestEnd: contestEnd.toISOString(),
+                standings: []
+            });
         }
 
         // Map userId → { username, is_rated }
@@ -430,7 +439,9 @@ export const getContestStandings = async (req, res) => {
 
         return res.status(200).json({
             success: true,
+            contestName: contest.contest_name,
             contestCode,
+            duration: contest.duration,
             problemIndices,
             contestStart: contestStart.toISOString(),
             contestEnd:   contestEnd.toISOString(),
