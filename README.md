@@ -71,7 +71,7 @@ The platform separates concerns across four distinct architectural tiers: the cl
 ### 1. High-Level Architecture
 
 ```mermaid
-graph TD
+flowchart TD
     subgraph ClientLayer["Frontend Client (React 19 + Vite)"]
         UI["Blueprint UI & Monaco Editor"]
         State["Auth Context & Router State"]
@@ -111,16 +111,17 @@ graph TD
     UI -->|"Trigger AI Evaluation"| AiEngine
     Poller -->|"Fetch Leaderboard"| StandingsEngine
 
-    AiEngine <-->|"Structured Prompt & JSON Schema"| GeminiAPI
+    AiEngine -->|"Structured Prompt & JSON Schema"| GeminiAPI
+    GeminiAPI -->|"Verified JSON Analysis"| AiEngine
 
-    AuthSvc <-->|"User Profiles"| UsersDB
-    ContestSvc <-->|"Contests & Enrollments"| ContestsDB
-    JudgeSvc <-->|"Verdicts & Metadata"| SubmissionsDB
-    JudgeSvc <-->|"Limits & Specs"| ProblemsDB
-    AiEngine <-->|"Fetch Problem Specs & Submission"| ProblemsDB
-    AiEngine <-->|"Fetch Submission Context"| SubmissionsDB
-    StandingsEngine <-->|"Registrations"| ContestsDB
-    StandingsEngine <-->|"Submissions in Window"| SubmissionsDB
+    AuthSvc -->|"User Profiles"| UsersDB
+    ContestSvc -->|"Contests & Enrollments"| ContestsDB
+    JudgeSvc -->|"Verdicts & Metadata"| SubmissionsDB
+    JudgeSvc -->|"Limits & Specs"| ProblemsDB
+    AiEngine -->|"Fetch Problem Specs & Submission"| ProblemsDB
+    AiEngine -->|"Fetch Submission Context"| SubmissionsDB
+    StandingsEngine -->|"Registrations"| ContestsDB
+    StandingsEngine -->|"Submissions in Window"| SubmissionsDB
 
     JudgeSvc -->|"Spawn Isolated Sandbox"| Compiler
     Compiler -->|"Output Executable"| ProcessRunner

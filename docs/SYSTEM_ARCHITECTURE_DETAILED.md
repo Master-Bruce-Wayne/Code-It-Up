@@ -39,15 +39,15 @@
 The system operates across four primary architectural boundaries: Client Application, Stateless Application Gateway, Isolated Judge Sandbox, and Persistent Cloud Database.
 
 ```mermaid
-graph TB
-    subgraph ClientTier["Client Tier (React 19 + Vite SPA)"]
+flowchart TD
+    subgraph ClientTier["Client Tier: React 19 + Vite SPA"]
         UI["Tactical Blueprint UI Components"]
         Monaco["Monaco Editor (C++ Environment)"]
-        ClientState["Auth Context / Browser Storage"]
+        ClientState["Auth Context & Browser Storage"]
         Poller["Leaderboard Real-Time Poller (60s)"]
     end
 
-    subgraph GatewayTier["API Gateway & Service Layer (Node.js / Express 5)"]
+    subgraph GatewayTier["API Gateway & Service Layer: Express 5"]
         AuthSvc["Auth & Session Controller"]
         ProbSvc["Problem Catalog Controller"]
         ContestSvc["Contest & Registration Controller"]
@@ -56,43 +56,46 @@ graph TB
         AiSvc["Gemini AI Optimization Service"]
     end
 
-    subgraph SandboxTier["Judge & Execution Sandbox (Local Node Host)"]
+    subgraph SandboxTier["Judge & Execution Sandbox"]
         UUIDGen["UUID Temporary Directory Generator"]
         FSManager["Source & IO File Stream Manager"]
         Compiler["GNU C++ Compiler (g++)"]
         ChildProcess["Child Process Runner (Node exec)"]
-        SignalMonitor["Signal & Limit Watcher (SIGSEGV, SIGALRM, TLE)"]
-        TestVerifier["Batch Testcase Verifier (judge_data/probCode)"]
+        SignalMonitor["Signal & Limit Watcher (SIGSEGV, TLE, etc.)"]
+        TestVerifier["Batch Testcase Verifier"]
     end
 
     subgraph DataTier["Data & External AI Tier"]
-        SupabaseDB[("Supabase PostgreSQL (Relational DB)")]
-        DiskStorage[("Local Disk: assets/judge_data")]
-        GeminiAPI[("Google Gemini 2.5 / 3 API (@google/genai)")]
+        SupabaseDB[("Supabase PostgreSQL Database")]
+        DiskStorage[("Local Disk: judge_data")]
+        GeminiAPI[("Google Gemini 2.5 / 3 API")]
     end
 
     %% Client to Gateway
-    UI -->|"REST + JSON"| GatewayTier
-    Monaco -->|"Code Run/Submit Payloads"| SubSvc
-    ClientState <-->|"Credentials / Profiles"| AuthSvc
-    Poller -->|"GET /contest/:code/standings"| StandingsSvc
+    UI -->|"REST / JSON"| AuthSvc
+    UI -->|"Contest Actions"| ContestSvc
+    Monaco -->|"Code Run / Submit"| SubSvc
+    ClientState -->|"Credentials / Profiles"| AuthSvc
+    Poller -->|"GET standings"| StandingsSvc
+    UI -->|"Trigger AI Analysis"| AiSvc
 
     %% Gateway to Data/AI
-    AuthSvc <-->|"JWT / Bcrypt / SQL"| SupabaseDB
-    ProbSvc <-->|"Problem Schemas / SQL"| SupabaseDB
-    ContestSvc <-->|"Registrations / Timers"| SupabaseDB
-    StandingsSvc <-->|"Filter Contest Subs in Window"| SupabaseDB
-    AiSvc <-->|"Structured JSON Schema"| GeminiAPI
+    AuthSvc -->|"JWT / Bcrypt / SQL"| SupabaseDB
+    ProbSvc -->|"Problem Schemas / SQL"| SupabaseDB
+    ContestSvc -->|"Registrations / Timers"| SupabaseDB
+    StandingsSvc -->|"Filter Contest Subs in Window"| SupabaseDB
+    AiSvc -->|"Fetch Problem Specs"| SupabaseDB
+    AiSvc -->|"Structured JSON Schema"| GeminiAPI
 
     %% Submissions to Judge
     SubSvc -->|"Spawn Ephemeral Environment"| UUIDGen
     UUIDGen --> FSManager
     FSManager --> Compiler
-    Compiler -->|"Compiled Binary .exe"| ChildProcess
+    Compiler -->|"Compiled Binary (.exe)"| ChildProcess
     ChildProcess --> SignalMonitor
     DiskStorage -->|"Input / Output Test Files"| TestVerifier
-    TestVerifier <-->|"Stdin Stream & Stdout Compare"| ChildProcess
-    SignalMonitor -->|"Verdict (AC, WA, TLE, CE, RTE)"| SubSvc
+    TestVerifier -->|"Stdin Stream & Stdout Compare"| ChildProcess
+    SignalMonitor -->|"Verdict: AC, WA, TLE, CE, RTE"| SubSvc
     SubSvc -->|"Persist Submission Record"| SupabaseDB
 ```
 
@@ -196,50 +199,50 @@ The online judge operates on the host server using Node.js child processes (`chi
 ```mermaid
 sequenceDiagram
     autonumber
-    actor User as Client (CodeEditorPage)
-    participant SubSvc as submissionController
+    actor User as Frontend Client
+    participant SubSvc as Submission Controller
     participant OS_FS as Local OS Filesystem
-    participant GCC as GNU C++ Compiler (g++)
+    participant GCC as GNU C++ Compiler
     participant Proc as Node child_process
     participant DB as Supabase PostgreSQL
 
-    User->>SubSvc: POST /submission/submit (code, language, probCode, userId)
-    SubSvc->>DB: Query problems table by probCode (Fetch time_limit)
+    User->>SubSvc: POST /submission/submit with code, lang, probCode, userId
+    SubSvc->>DB: Query problems table by probCode to fetch time_limit
     DB-->>SubSvc: Return problem metadata (e.g. 2000ms limit)
-    SubSvc->>OS_FS: Create unique directory: temp/<UUID>/
-    SubSvc->>OS_FS: Write temp/<UUID>/main.cpp
-    SubSvc->>GCC: g++ "temp/<UUID>/main.cpp" -o "temp/<UUID>/main.exe"
+    SubSvc->>OS_FS: Create unique directory temp/uuid/
+    SubSvc->>OS_FS: Write source to temp/uuid/main.cpp
+    SubSvc->>GCC: Invoke g++ to compile main.cpp into main.exe
     
     alt Compilation Error (CE)
-        GCC-->>SubSvc: Non-zero exit code / compiler stderr
-        SubSvc->>DB: Insert into submissions (verdict: "CE")
-        SubSvc-->>User: { success: false, verdict: "CE", message: "Code compiled with errors" }
+        GCC-->>SubSvc: Non-zero exit code or compiler stderr
+        SubSvc->>DB: Insert into submissions with verdict "CE"
+        SubSvc-->>User: Return CE verdict and compiler error output
     else Compilation Success
-        GCC-->>SubSvc: Binary main.exe generated
-        loop Iterate over assets/judge_data/<probCode>/input[i].txt
-            SubSvc->>OS_FS: Read input[i].txt and output[i].txt
-            SubSvc->>Proc: Execute main.exe with timeout: problem.time_limit
-            Proc->>Proc: Pipe stdin from input[i].txt
+        GCC-->>SubSvc: Binary main.exe generated successfully
+        loop Iterate over problem testcases on disk
+            SubSvc->>OS_FS: Read input and output files for testcase
+            SubSvc->>Proc: Execute main.exe with timeout problem.time_limit
+            Proc->>Proc: Pipe stdin from input testcase
             
             alt Process Timeouts (Exceeds time_limit)
-                Proc-->>SubSvc: SIGKILL / error.killed = true
-                Note over SubSvc: Set verdict = "TLE" & Break loop
-            else Process Crashes (SIGSEGV / SIGABRT / Non-zero)
-                Proc-->>SubSvc: Error signal captured
-                Note over SubSvc: Map to "SIGSEGV" / "RTE" & Break loop
+                Proc-->>SubSvc: Timeout signal captured (error.killed = true)
+                Note over SubSvc: Set verdict to TLE and break loop
+            else Process Crashes (SIGSEGV / SIGABRT / Non-zero exit)
+                Proc-->>SubSvc: Crash signal captured
+                Note over SubSvc: Map to SIGSEGV or RTE and break loop
             else Process Exits Normally (Exit Code 0)
                 Proc-->>SubSvc: Return stdout
-                SubSvc->>SubSvc: String Diff: stdout.trim() == output[i].trim()
-                alt Mismatch
-                    Note over SubSvc: Set verdict = "WA" & Break loop
-                else Matches
+                SubSvc->>SubSvc: Compare stdout against expected testcase output
+                alt Output Mismatch
+                    Note over SubSvc: Set verdict to WA and break loop
+                else Output Matches
                     Note over SubSvc: Continue to next testcase
                 end
             end
         end
-        SubSvc->>DB: Insert into submissions (user_id, prob_id, verdict, code, ...)
-        SubSvc->>OS_FS: Cleanup temp/<UUID>/ (Purge executable & source)
-        SubSvc-->>User: { success: true, verdict: verdict }
+        SubSvc->>DB: Insert into submissions (user_id, prob_id, verdict, metrics)
+        SubSvc->>OS_FS: Clean up temp/uuid/ directory
+        SubSvc-->>User: Return final execution verdict and metrics
     end
 ```
 
@@ -271,29 +274,29 @@ Contest progression is strictly synchronized using UTC wall-clock timestamps com
 
 ```mermaid
 stateDiagram-v2
-    [*] --> Upcoming: Admin creates contest with future start_time
+    [*] --> Upcoming: Admin creates contest with future start time
     
     state Upcoming {
         [*] --> RegistrationOpen
-        RegistrationOpen --> RegisteredRated: POST /register (isRated: true)
-        RegistrationOpen --> RegisteredUnrated: POST /register (isRated: false)
+        RegistrationOpen --> RegisteredRated: Register rated track
+        RegistrationOpen --> RegisteredUnrated: Register unrated track
         RegisteredRated --> CountdownDisplay: Client countdown active
         RegisteredUnrated --> CountdownDisplay
         note right of CountdownDisplay
             Problems table hidden.
-            API returns mapped.problems = []
+            API returns empty problem list.
         end note
     }
 
-    Upcoming --> Live: Clock >= start_time (Client triggers auto-reload)
+    Upcoming --> Live: Clock reaches start time
     
     state Live {
-        [*] --> ProblemsUnlocked: API returns contest_problems
-        ProblemsUnlocked --> ScoringActive: Submissions accepted & evaluated
+        [*] --> ProblemsUnlocked: API unlocks contest problem list
+        ProblemsUnlocked --> ScoringActive: Submissions accepted and evaluated
         ScoringActive --> RealtimePolling: Frontend auto-polls standings (60s)
     }
 
-    Live --> Past: Clock >= (start_time + duration * 60000)
+    Live --> Past: Contest duration elapses
 
     state Past {
         [*] --> FrozenResults: Standings frozen
@@ -373,21 +376,31 @@ The platform integrates the Google Gemini API using the official `@google/genai`
 The engine prompts Gemini with the competitive programming context, user source code, problem description, and execution verdict. It forces structured JSON output via `responseMimeType: "application/json"` and `responseSchema`:
 
 ```mermaid
-graph TD
+flowchart TD
     InputPayload["User Code + Problem Constraints + Execution Verdict"] --> ContextBuilder["Context & Prompt Assembly"]
     ContextBuilder --> GenAIClient["GoogleGenAI Client (gemini-2.5-flash / gemini-3)"]
     
     subgraph SchemaEnforcement["Gemini Typed Schema Enforcement"]
-        GenAIClient --> Summary["summary (String)"]
-        GenAIClient --> VerdictDiag["verdictDiagnosis (String: Root cause of WA/TLE/CE)"]
-        GenAIClient --> Comp["complexity (Object: Current vs Optimal Big-O)"]
-        GenAIClient --> Pitfalls["issuesAndEdgeCases (Array of Strings)"]
-        GenAIClient --> Opts["optimizations (Array of Title + Description)"]
-        GenAIClient --> Code["suggestedCode (String: Formatted C++ Code)"]
-        GenAIClient --> CodeExpl["suggestedCodeExplanation (String)"]
+        direction TB
+        Summary["summary (Executive Analysis)"]
+        VerdictDiag["verdictDiagnosis (Root cause for WA, TLE, CE, RTE)"]
+        Comp["complexity (Current vs Optimal Big-O)"]
+        Pitfalls["issuesAndEdgeCases (Boundary & Overflow Warnings)"]
+        Opts["optimizations (Actionable Algorithmic Improvements)"]
+        Code["suggestedCode (Canonical C++ Solution)"]
+        CodeExpl["suggestedCodeExplanation (Step-by-step logic)"]
     end
 
-    SchemaEnforcement --> ResponsePayload["Parsed JSON Payload returned to Frontend"]
+    GenAIClient --> Summary
+    GenAIClient --> VerdictDiag
+    GenAIClient --> Comp
+    GenAIClient --> Pitfalls
+    GenAIClient --> Opts
+    GenAIClient --> Code
+    GenAIClient --> CodeExpl
+
+    Summary --> ResponsePayload["Parsed JSON Payload returned to Frontend"]
+    Code --> ResponsePayload
     ResponsePayload --> ModalUI["Rendered in AiAnalysisModal with 1-Click Editor Insertion"]
 ```
 
@@ -412,8 +425,8 @@ erDiagram
 
     PROFILES {
         uuid id PK
-        string username UK
-        string email UK
+        string username "Unique"
+        string email "Unique"
         string password "Bcrypt hash"
         string full_name
         string affiliation
@@ -424,18 +437,18 @@ erDiagram
     PROBLEMS {
         uuid id PK
         string prob_name
-        string prob_code UK
+        string prob_code "Unique"
         text prob_desc
         int prob_rating
-        int time_limit "Execution timeout in ms"
-        int memory_limit "Memory ceiling in KB"
+        int time_limit "Execution timeout ms"
+        int memory_limit "Memory ceiling KB"
         timestamp created_at
     }
 
     CONTESTS {
         uuid id PK
         string contest_name
-        string contest_code UK
+        string contest_code "Unique"
         timestamp start_time "UTC Start timestamp"
         int duration "Duration in minutes"
         boolean rated "Global rating impact flag"
